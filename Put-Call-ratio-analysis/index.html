@@ -1,0 +1,1839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Mulish:300,300italic,400,400italic,700,700italic|Lato:300,300italic,400,400italic,700,700italic|Noto Serif SC:300,300italic,400,400italic,700,700italic|Inconsolata:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"hankkdd.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="▌前言（Introduction） 本研究源自於大二期間加入系上教授實驗室，參與一項以當沖交易策略為核心的研究專案。在該專案中，我負責尋找可供模型學習的選擇權相關因子，以輔助短期交易決策。 在眾多選擇權指標中，我選擇 Put–Call Ratio（PCR） 作為研究主軸。原因在於 PCR 能同時反映市場的方向性情緒與避險需求結構，並且廣泛被應用於衍生性商品與市場結構研究中 。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Put Call ratio analysis">
+<meta property="og:url" content="https://hankkdd.github.io/Put-Call-ratio-analysis/index.html">
+<meta property="og:site_name" content="Hankdd&#39;s Blog">
+<meta property="og:description" content="▌前言（Introduction） 本研究源自於大二期間加入系上教授實驗室，參與一項以當沖交易策略為核心的研究專案。在該專案中，我負責尋找可供模型學習的選擇權相關因子，以輔助短期交易決策。 在眾多選擇權指標中，我選擇 Put–Call Ratio（PCR） 作為研究主軸。原因在於 PCR 能同時反映市場的方向性情緒與避險需求結構，並且廣泛被應用於衍生性商品與市場結構研究中 。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://hankkdd.github.io/assets/distribution.png">
+<meta property="og:image" content="https://hankkdd.github.io/assets/3dayshockwinTimeline.png">
+<meta property="og:image" content="https://hankkdd.github.io/assets/otmVPCRDaycompare1.5.png">
+<meta property="og:image" content="https://hankkdd.github.io/assets/dominant%20test.png">
+<meta property="og:image" content="https://hankkdd.github.io/assets/ES_PutD.png">
+<meta property="og:image" content="https://hankkdd.github.io/assets/OTMPCRStrategy_rolling.png">
+<meta property="article:published_time" content="2026-01-19T15:42:53.000Z">
+<meta property="article:modified_time" content="2026-01-23T15:17:02.057Z">
+<meta property="article:author" content="Hankdd">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hankkdd.github.io/assets/distribution.png">
+
+<link rel="canonical" href="https://hankkdd.github.io/Put-Call-ratio-analysis/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Put Call ratio analysis | Hankdd's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hankdd's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://hankkdd.github.io/Put-Call-ratio-analysis/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E6%AD%90%E7%88%BE%E9%BA%A5%E7%89%B9.jpg">
+      <meta itemprop="name" content="Hankdd">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hankdd's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Put Call ratio analysis
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2026-01-19 15:42:53" itemprop="dateCreated datePublished" datetime="2026-01-19T15:42:53+00:00">2026-01-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2026-01-23 15:17:02" itemprop="dateModified" datetime="2026-01-23T15:17:02+00:00">2026-01-23</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <hr />
+<h1 id="前言introduction">▌前言（Introduction）</h1>
+<p>本研究源自於大二期間加入系上教授實驗室，參與一項以當沖交易策略為核心的研究專案。在該專案中，我負責尋找可供模型學習的選擇權相關因子，以輔助短期交易決策。</p>
+<p>在眾多選擇權指標中，我選擇 <strong>Put–Call Ratio（PCR）</strong>
+作為研究主軸。原因在於 PCR
+能同時反映市場的方向性情緒與避險需求結構，並且廣泛被應用於衍生性商品與市場結構研究中
+。</p>
+<span id="more"></span>
+<h2 id="研究資料">1. 研究資料</h2>
+<ul>
+<li><strong>標的資產</strong>：台灣加權股價指數。</li>
+<li><strong>選擇權資料</strong>：台指選擇權（TXO）。</li>
+<li><strong>研究期間</strong>：2016 年 – 2026 年。</li>
+</ul>
+<h2 id="指標定義與背景知識">2. 指標定義與背景知識</h2>
+<h4 id="putcall-ratiopcr"><strong>Put–Call Ratio（PCR）</strong></h4>
+<p>PCR 定義為賣權與買權的比值：</p>
+<p><span class="math display">$$PCR_t =
+\frac{Put_t}{Call_t}$$</span></p>
+<p>本研究關注的是 <strong>變化量（Delta）</strong>
+而非絕對水準（Level）： <span
+class="math display"><em>Δ</em><em>P</em><em>C</em><em>R</em><sub><em>t</em></sub> = <em>P</em><em>C</em><em>R</em><sub><em>t</em></sub> − <em>P</em><em>C</em><em>R</em><sub><em>t</em> − 1</sub></span></p>
+<blockquote>
+<p><strong>為什麼不用 PCR Level？</strong> PCR
+水準可能長期偏高或偏低，容易混入結構性市場差異（如牛市/熊市環境。</p>
+</blockquote>
+<!-- TODO: add image: Put-Call Ratio formula and financial interpretation -->
+<h4 id="數據類型與價位分類"><strong>數據類型與價位分類</strong></h4>
+<ul>
+<li><strong>未平倉量（Open Interest,
+OI）</strong>：市場中尚未平倉的合約數量。</li>
+<li><strong>成交量（Volume）</strong>：當日交易行為。</li>
+<li><strong>價位區分（Moneyness）</strong>：
+<ul>
+<li><strong>ITM（價內）</strong></li>
+<li><strong>ATM（價平）</strong></li>
+<li><strong>OTM（價外）</strong> <!-- TODO: add image: option moneyness ITM ATM OTM diagram --></li>
+</ul></li>
+</ul>
+<hr />
+<h1 id="階段一統計檢定">▌階段一：統計檢定</h1>
+<h2 id="研究目的">1. 研究目的</h2>
+<p>探討不同類型的選擇權指標變化，是否對隔日報酬具有顯著影響？</p>
+<h2 id="實驗設計">2. 實驗設計</h2>
+<ul>
+<li><strong>特徵類型</strong>：包含 OI/Vol 的 PCR Delta、Put Delta、Call
+Delta，並區分整體與 ITM/ATM/OTM 維度。</li>
+<li><strong>檢定方式</strong>：使用兩樣本 <strong>t-test</strong>
+比較「極端變化日（Z-score 門檻）」與「正常日」的隔日報酬 。</li>
+</ul>
+<details>
+<summary>
+<b> 點擊展開：極端變化日的具體定義（Implementation Details）</b>
+</summary>
+<div class="note info">
+            <h3 id="指標分類邏輯">🛠️ 指標分類邏輯</h3><p>在本研究中，極端正向與極端負向變化的判定，係依據指標相對於其歷史分佈的位置進行分類。實作邏輯係透過計算Z-score 辨識異常波動 。</p><h4 id="step-1計算統計量-baseline-statistics"><strong>Step 1：計算統計量(Baseline Statistics)</strong></h4><p>對每一項選擇權指標（如 OI PCR Delta、Volume PCRDelta），先於整個歷史樣本期間計算其基準分佈：</p><ul><li><strong>平均值</strong>（Mean, <spanclass="math inline"><em>μ</em></span>）</li><li><strong>標準差</strong>（Standard Deviation, <spanclass="math inline"><em>σ</em></span>）</li></ul><h4 id="step-2設定極端門檻-threshold"><strong>Step 2：設定極端門檻(Threshold)</strong></h4><p>本研究採用的核心門檻設定為： <spanclass="math display">threshold = 1.5 × <em>σ</em></span> 即以<strong>1.5 倍標準差</strong> 作為辨識相對罕見波動的標準。</p><h4 id="step-3分類規則-classification-rule"><strong>Step 3：分類規則(Classification Rule)</strong></h4><p>根據當日指標變化量（<spanclass="math inline"><em>Δ</em></span>），將每一交易日歸類為以下三種狀態：</p><ol type="1"><li><p><strong>極端正向 (Extreme Positive)</strong>當指標變化量滿足：<spanclass="math display"><em>Δ</em> &gt; <em>μ</em> + 1.5<em>σ</em></span>代表該指標於當日出現異常大幅上升。</p></li><li><p><strong>極端負向 (Extreme Negative)</strong>當指標變化量滿足：<spanclass="math display"><em>Δ</em> &lt; <em>μ</em> − 1.5<em>σ</em></span>代表該指標於當日出現異常大幅下降。</p></li><li><p><strong>正常 (Normal)</strong> 當指標變化量處於常態分佈區間：<spanclass="math display"><em>μ</em> − 1.5<em>σ</em> ≤ <em>Δ</em> ≤ <em>μ</em> + 1.5<em>σ</em></span></p></li></ol><p><img src="../assets/distribution.png" /></p><p>各組分佈形狀大致相近，未出現明顯偏態或多峰結構。在此情況下，考量樣本數規模與研究目的，本文將 t-test視為初步篩選工具，用以辨識可能具備結構差異的指標，並於後續階段採用rolling 分析與 event study 進一步檢驗其穩定性與時間結構。</p><p><br/></p>
+          </div>
+</details>
+<p><br/></p>
+<div class="note success">
+            <p><strong>階段一：主要發現</strong><br />在全樣本檢定中，僅有少數指標展現統計顯著性（<spanclass="math inline"><em>p</em> &lt; 0.05</span>）：</p><ol type="1"><li><strong>OI PCRDelta</strong>：<strong>極端正向</strong>與<strong>負向</strong>變動皆顯著。</li><li><strong>Volume CallDelta</strong>：<strong>極端正向</strong>變動顯著 。</li><li><strong>OTM OI CallDelta</strong>：<strong>極端負向</strong>變動具備顯著性 。</li></ol>
+          </div>
+<details>
+<summary>
+<b> 點擊展開：階段一數據結果 </b>
+</summary>
+<h3 id="選擇權指標-t-檢定彙整表-threshold-1.5">選擇權指標 t 檢定彙整表
+(Threshold = 1.5)</h3>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">指標名稱</th>
+<th style="text-align: left;">比較組</th>
+<th style="text-align: center;">t 值</th>
+<th style="text-align: center;">p-value</th>
+<th style="text-align: center;">極端天數</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>OI PCR (整體)</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">2.1453</td>
+<td style="text-align: center;"><strong>0.0335</strong>*</td>
+<td style="text-align: center;">139</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>OI PCR (整體)</strong></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">2.5565</td>
+<td style="text-align: center;"><strong>0.0115</strong>*</td>
+<td style="text-align: center;">147</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Vol Call Delta
+(整體)</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">2.1299</td>
+<td style="text-align: center;"><strong>0.0355</strong>*</td>
+<td style="text-align: center;">102</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>OTM OI Call Delta</strong></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">-1.9884</td>
+<td style="text-align: center;"><strong>0.0486</strong>*</td>
+<td style="text-align: center;">138</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">—</td>
+<td style="text-align: left;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Volume PCR (整體)</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">-0.4917</td>
+<td style="text-align: center;">0.6234</td>
+<td style="text-align: center;">182</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Volume PCR (整體)</strong></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">-0.6390</td>
+<td style="text-align: center;">0.5237</td>
+<td style="text-align: center;">152</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Vol Put Delta (整體)</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">0.6364</td>
+<td style="text-align: center;">0.5258</td>
+<td style="text-align: center;">106</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Vol Put Delta (整體)</strong></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">0.2580</td>
+<td style="text-align: center;">0.7966</td>
+<td style="text-align: center;">219</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Vol Call Delta
+(整體)</strong></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">0.3952</td>
+<td style="text-align: center;">0.6931</td>
+<td style="text-align: center;">221</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>ITM Vol Call Delta</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">1.5217</td>
+<td style="text-align: center;">0.1309</td>
+<td style="text-align: center;">106</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>ITM Vol Call Delta</strong></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">-0.0594</td>
+<td style="text-align: center;">0.9527</td>
+<td style="text-align: center;">99</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>ITM Vol Put Delta</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">1.3602</td>
+<td style="text-align: center;">0.1772</td>
+<td style="text-align: center;">89</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>ITM Vol Put Delta</strong></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">-0.0591</td>
+<td style="text-align: center;">0.9530</td>
+<td style="text-align: center;">90</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>ITM Vol PCR Delta</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">0.9473</td>
+<td style="text-align: center;">0.3497</td>
+<td style="text-align: center;">37</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>ITM Vol PCR Delta</strong></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">0.7544</td>
+<td style="text-align: center;">0.4553</td>
+<td style="text-align: center;">38</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>ATM Vol Call Delta</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">0.6004</td>
+<td style="text-align: center;">0.5496</td>
+<td style="text-align: center;">93</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>ATM Vol Call Delta</strong></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">-1.1782</td>
+<td style="text-align: center;">0.2396</td>
+<td style="text-align: center;">270</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>ATM Vol Put Delta</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">0.6955</td>
+<td style="text-align: center;">0.4883</td>
+<td style="text-align: center;">99</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>ATM Vol Put Delta</strong></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">-0.0034</td>
+<td style="text-align: center;">0.9973</td>
+<td style="text-align: center;">252</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>ATM Vol PCR Delta</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">1.1631</td>
+<td style="text-align: center;">0.2494</td>
+<td style="text-align: center;">60</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>ATM Vol PCR Delta</strong></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">0.2673</td>
+<td style="text-align: center;">0.7901</td>
+<td style="text-align: center;">63</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>OTM Vol Call Delta</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">0.8268</td>
+<td style="text-align: center;">0.4098</td>
+<td style="text-align: center;">129</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>OTM Vol Call Delta</strong></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">0.4007</td>
+<td style="text-align: center;">0.6893</td>
+<td style="text-align: center;">137</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>OTM Vol Put Delta</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">-0.2775</td>
+<td style="text-align: center;">0.7818</td>
+<td style="text-align: center;">143</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>OTM Vol Put Delta</strong></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">-1.2885</td>
+<td style="text-align: center;">0.1996</td>
+<td style="text-align: center;">141</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>OTM Vol PCR Delta</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">0.1092</td>
+<td style="text-align: center;">0.9132</td>
+<td style="text-align: center;">140</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>OTM Vol PCR Delta</strong></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">0.0044</td>
+<td style="text-align: center;">0.9965</td>
+<td style="text-align: center;">135</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>ITM OI Call Delta</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">0.3633</td>
+<td style="text-align: center;">0.7168</td>
+<td style="text-align: center;">135</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>ITM OI Call Delta</strong></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">0.4492</td>
+<td style="text-align: center;">0.6541</td>
+<td style="text-align: center;">119</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>ITM OI Put Delta</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">0.5309</td>
+<td style="text-align: center;">0.5966</td>
+<td style="text-align: center;">106</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>ITM OI Put Delta</strong></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">-0.7150</td>
+<td style="text-align: center;">0.4762</td>
+<td style="text-align: center;">99</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>ITM OI PCR Delta</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">1.7347</td>
+<td style="text-align: center;">0.0883</td>
+<td style="text-align: center;">57</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>ITM OI PCR Delta</strong></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">-0.8681</td>
+<td style="text-align: center;">0.3895</td>
+<td style="text-align: center;">50</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>ATM OI Call Delta</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">1.1294</td>
+<td style="text-align: center;">0.2624</td>
+<td style="text-align: center;">65</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>ATM OI Call Delta</strong></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">-1.4435</td>
+<td style="text-align: center;">0.1498</td>
+<td style="text-align: center;">245</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>ATM OI Put Delta</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">0.5908</td>
+<td style="text-align: center;">0.5563</td>
+<td style="text-align: center;">73</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>ATM OI Put Delta</strong></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">-1.2165</td>
+<td style="text-align: center;">0.2247</td>
+<td style="text-align: center;">258</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>ATM OI PCR Delta</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">0.4936</td>
+<td style="text-align: center;">0.6227</td>
+<td style="text-align: center;">98</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>ATM OI PCR Delta</strong></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">0.4108</td>
+<td style="text-align: center;">0.6821</td>
+<td style="text-align: center;">94</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>OTM OI Call Delta</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">0.0201</td>
+<td style="text-align: center;">0.9840</td>
+<td style="text-align: center;">105</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>OTM OI Put Delta</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">-1.3134</td>
+<td style="text-align: center;">0.1948</td>
+<td style="text-align: center;">51</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>OTM OI Put Delta</strong></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">0.3747</td>
+<td style="text-align: center;">0.7083</td>
+<td style="text-align: center;">155</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>OTM OI PCR Delta</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">0.8485</td>
+<td style="text-align: center;">0.3977</td>
+<td style="text-align: center;">119</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>OTM OI PCR Delta</strong></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">0.6923</td>
+<td style="text-align: center;">0.4900</td>
+<td style="text-align: center;">119</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>註記：</strong> 標註 <strong>粗體</strong>*
+處代表具備統計顯著性 (<span
+class="math inline"><em>p</em> &lt; 0.05</span>) 2。</p>
+</blockquote>
+</details>
+<h3 id="階段一方法的限制">3. 階段一方法的限制</h3>
+<p>儘管篩選出部分指標，但此方法存在明顯缺點：</p>
+<ul>
+<li><strong>忽略市場狀態</strong>：將所有樣本視為同質，掩蓋了特定環境下的有效訊號。</li>
+<li><strong>靜態標準化不足</strong>：全樣本平均值無法反映當下市場結構的相對異常。</li>
+</ul>
+<hr />
+<h2
+id="階段二結構化與時變分析weekly-monthly-rolling-standardization">▌階段二：結構化與時變分析（Weekly
+/ Monthly × Rolling Standardization）</h2>
+<h3 id="研究動機">1. 研究動機</h3>
+<p>在第一階段的靜態檢定中，我發現大多數選擇權指標（特別是成交量相關的
+PCR 類指標），在全樣本、靜態比較下並不顯著。
+但這並不代表指標本身沒有資訊，而是可能被以下因素掩蓋：</p>
+<ul>
+<li><strong>不同到期結構混在一起</strong>：週選與月選的交易動機明顯不同，直接合併分析容易稀釋訊號。</li>
+<li><strong>市場狀態隨時間改變</strong>：使用全期間的平均與標準差，可能無法反映某些特定時段的「異常行為」。</li>
+<li><strong>PCR 類指標可能不是線性預測因子</strong>：PCR 類指標可能屬於
+<strong>「結構／事件型」</strong>
+訊號，其資訊性僅在相對極端、非常態的狀態下顯現。</li>
+</ul>
+<p>因此，第二階段的核心目標是驗證：<strong>PCR
+類指標是否對「選擇權結構」與「當下市場狀態」具有高度敏感性？</strong></p>
+<h3 id="方法設計">2. 方法設計</h3>
+<p>本研究引入兩個關鍵改動，將分析維度從「絕對值」轉向「相對衝擊」：</p>
+<h4
+id="依選擇權到期型態區分strict-separation">依選擇權到期型態區分（Strict
+Separation）</h4>
+<ol type="1">
+<li><strong>週選擇權 (Weekly
+Options)</strong>：存續期間短，通常用於短期避險、事件交易與方向性押注。</li>
+<li><strong>月選擇權 (Monthly
+Options)</strong>：存續期間較長，更偏向中長期部位配置與策略性避險。</li>
+</ol>
+<h4 id="rolling-標準化time-varying-normalization">Rolling
+標準化（Time-Varying Normalization）</h4>
+<p>為辨識相對於當下市場狀態的 <strong>異常變化（Shock）</strong>，對每日
+PCR Delta 進行滾動標準化：</p>
+<ul>
+<li><strong>窗口大小</strong>：過去 252 個交易日。</li>
+<li><strong>Rolling Z-score 公式</strong>： <span
+class="math display">$$Z_t = \frac{\Delta PCR_t -
+\mu_{rolling}}{\sigma_{rolling}}$$</span> 其中 <span
+class="math inline"><em>μ</em></span> 為滾動平均值，<span
+class="math inline"><em>σ</em></span> 為滾動標準差。</li>
+</ul>
+<hr />
+<h2 id="核心結果與解讀">3. 核心結果與解讀</h2>
+<h3 id="一-weekly-volume-pcr-delta">(一) Weekly × Volume PCR
+Delta：</h3>
+<p>在週選成交量 PCR 的 Rolling 分析中，呈現出顯著的狀態切換特性：</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 21%" />
+<col style="width: 21%" />
+<col style="width: 21%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">特徵指標 (Feature)</th>
+<th style="text-align: left;">訊號類別</th>
+<th style="text-align: center;">樣本數 (n)</th>
+<th style="text-align: center;">平均報酬</th>
+<th style="text-align: center;">夏普值 (Sharpe)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>OTM Vol PCR Delta</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">51</td>
+<td style="text-align: center;">0.1240%</td>
+<td style="text-align: center;"><strong>3.92</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">50</td>
+<td style="text-align: center;">0.1814%</td>
+<td style="text-align: center;"><strong>4.04</strong></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">正常區間</td>
+<td style="text-align: center;">1766</td>
+<td style="text-align: center;">0.0573%</td>
+<td style="text-align: center;">1.65</td>
+</tr>
+</tbody>
+</table>
+<p>從 Rolling 結果來看，週選 OTM 成交量 PCR 在極端狀態下的 Sharpe Ratio
+明顯高於正常區間，且正負方向皆呈現類似行為，顯示該指標較可能反映市場短期結構變化，而非單純的多空方向訊號。不過，此差異是否源自特定交易行為或市場機制，仍有待進一步分析。</p>
+<h3 id="二-weekly-oi-pcr-delta">(二) Weekly × OI PCR Delta：</h3>
+<p>與成交量的「即時性」不同，未平倉量（OI）展現出籌碼累積特性：</p>
+<ul>
+<li><strong>單邊效應</strong>：正極端變化結果較明顯（Sharpe =
+<strong>4.71</strong>），負向效果(Sharpe = 1.67)則與 Normal
+差異不大。</li>
+<li>相較於 Volume PCR，OI PCR
+的效果呈現出較明顯的不對稱性，顯示其可能更多捕捉的是市場部位配置的方向性變化，而非事件型的即時衝擊。</li>
+</ul>
+<h3 id="三-monthly-選擇權效果顯著稀釋">(三) Monthly
+選擇權：效果顯著稀釋</h3>
+<p>在月選合約中，Rolling 極端狀態與 Normal 區間的差異普遍不明顯。</p>
+<p>由於月選合約存續期間較長，其成交量與未平倉量變化可能同時反映中長期部位配置、策略性避險與展期行為，使得短期相對異常變化的資訊性被稀釋。因此，在本研究設定的短期預測與狀態辨識框架下，月選選擇權較不適合作為敏感的市場狀態指標。</p>
+<p>基於上述觀察，後續分析將聚焦於對短期情緒與事件反應更為敏感的
+<strong>Weekly Options</strong>。</p>
+<details>
+<summary>
+<b> 點擊展開：rolling 回測結果</b>
+</summary>
+<h3
+id="週選擇權滾動測試回測數據-weekly-options---rolling-test">週選擇權滾動測試回測數據
+(Weekly Options - Rolling Test)</h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 21%" />
+<col style="width: 21%" />
+<col style="width: 21%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">特徵指標 (Feature)</th>
+<th style="text-align: left;">訊號類別</th>
+<th style="text-align: center;">樣本數 (n)</th>
+<th style="text-align: center;">平均報酬</th>
+<th style="text-align: center;">夏普值 (Sharpe)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>OI PCR Delta</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">109</td>
+<td style="text-align: center;">0.1782%</td>
+<td style="text-align: center;"><strong>4.71</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">118</td>
+<td style="text-align: center;">0.0689%</td>
+<td style="text-align: center;">1.67</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">正常區間</td>
+<td style="text-align: center;">1640</td>
+<td style="text-align: center;">0.0542%</td>
+<td style="text-align: center;">1.58</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Vol PCR Delta</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">120</td>
+<td style="text-align: center;">-0.0542%</td>
+<td style="text-align: center;">-1.31</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">126</td>
+<td style="text-align: center;">0.0527%</td>
+<td style="text-align: center;">1.33</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">正常區間</td>
+<td style="text-align: center;">1621</td>
+<td style="text-align: center;">0.0718%</td>
+<td style="text-align: center;">2.11</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>OTM Vol PCR Delta</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">51</td>
+<td style="text-align: center;">0.1240%</td>
+<td style="text-align: center;"><strong>3.92</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">50</td>
+<td style="text-align: center;">0.1814%</td>
+<td style="text-align: center;"><strong>4.04</strong></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">正常區間</td>
+<td style="text-align: center;">1766</td>
+<td style="text-align: center;">0.0573%</td>
+<td style="text-align: center;">1.65</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3
+id="月選擇權滾動測試回測數據-monthly-options---rolling-test">月選擇權滾動測試回測數據
+(Monthly Options - Rolling Test)</h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 21%" />
+<col style="width: 21%" />
+<col style="width: 21%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">特徵指標 (Feature)</th>
+<th style="text-align: left;">訊號類別</th>
+<th style="text-align: center;">樣本數 (n)</th>
+<th style="text-align: center;">平均報酬</th>
+<th style="text-align: center;">夏普值 (Sharpe)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>OI PCR Delta</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">111</td>
+<td style="text-align: center;">0.0708%</td>
+<td style="text-align: center;">1.84</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">112</td>
+<td style="text-align: center;">0.0918%</td>
+<td style="text-align: center;">2.35</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">正常區間</td>
+<td style="text-align: center;">1960</td>
+<td style="text-align: center;">0.0619%</td>
+<td style="text-align: center;">1.83</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Vol PCR Delta</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">145</td>
+<td style="text-align: center;">0.0553%</td>
+<td style="text-align: center;">1.90</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">151</td>
+<td style="text-align: center;">0.0999%</td>
+<td style="text-align: center;">3.28</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">正常區間</td>
+<td style="text-align: center;">1887</td>
+<td style="text-align: center;">0.0617%</td>
+<td style="text-align: center;">1.76</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>OTM Vol PCR Delta</strong></td>
+<td style="text-align: left;">極端正向</td>
+<td style="text-align: center;">113</td>
+<td style="text-align: center;">0.0256%</td>
+<td style="text-align: center;">0.98</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">極端負向</td>
+<td style="text-align: center;">100</td>
+<td style="text-align: center;">0.0233%</td>
+<td style="text-align: center;">0.79</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">正常區間</td>
+<td style="text-align: center;">1970</td>
+<td style="text-align: center;">0.0682%</td>
+<td style="text-align: center;">1.94</td>
+</tr>
+</tbody>
+</table>
+</details>
+<h3 id="階段二小結">4. 階段二小結</h3>
+<p>整體結果顯示，PCR
+類指標的資訊性並非普遍存在，而是依賴於選擇權結構與市場狀態。相較於月選合約，週選選擇權的變化更能即時反映短期市場行為。</p>
+<p>其中，OTM Volume PCR Delta
+並未在第一階段呈現顯著效果，而是在週選選擇權中，當指標相對於近一年水準出現明顯偏離時，才展現出優於正常狀態的風險調整後表現。這樣的行為特性暗示，該指標較可能反映市場於非常態時刻的結構性調整，而非持續性的預測關係。</p>
+<p>在確認此類「異常狀態」具備顯著的績效差異後，研究進一步關注其時間動態特性：</p>
+<p><strong>這些由選擇權市場觸發的衝擊，其影響通常會在多長的時間內被市場吸收與消化？</strong></p>
+<hr />
+<h2 id="階段三event-study事件研究與時間傳導分析">▌階段三：Event
+Study（事件研究與時間傳導分析）</h2>
+<hr />
+<h3 id="研究動機-1">1. 研究動機</h3>
+<p>在第二階段中，我們確認了 <strong>Weekly OTM Volume PCR Delta</strong>
+在發生異常變動後時，市場會進入較可預測的狀態。然而，這引出了一個關鍵問題：</p>
+<p><strong>「這類 Shock
+對市場的影響，會在多長時間內被價格消化？」</strong></p>
+<p>本階段的研究重點在於釐清：</p>
+<ul>
+<li><strong>反應速度</strong>：影響是立即反應還是逐步發酵？</li>
+<li><strong>持續性</strong>：訊號是短暫的情緒衝擊，還是可持續的結構改變？</li>
+<li><strong>系統性差異</strong>：不同類型的 PCR
+在時間傳導上是否有顯著不同？</li>
+</ul>
+<hr />
+<h3 id="事件定義與實驗設計">2. 事件定義與實驗設計</h3>
+<h4 id="事件定義event">事件定義（Event）</h4>
+<ul>
+<li><strong>觸發條件</strong>：當 Weekly OTM Volume PCR Delta
+出現極端變化（Z-score &gt; 閾值）時，定義為一個事件。</li>
+<li><strong>定位點</strong>：儘管指標源於週選資料，但指標為每日產生，因此事件時間點可精確定位至特定交易日。</li>
+</ul>
+<p>另外，當我想確認指標出現的時機的時候，我注意到一個有趣但值得警惕的現象。
+當 OTM Volume PCR 變化量
+出現大幅變化時，這些極端點有時不是零星、獨立地出現，而是在時間上高度集中。實際上，經常可以觀察到：
+極端正向隔一至兩天後，接續出現方向相反的極端負向訊號。</p>
+<p>下圖展示了極端訊號在時間軸上的分布情形（極端點分布圖）：</p>
+<p><img src="../assets/3dayshockwinTimeline.png" /></p>
+<p>可以看到，極端正負訊號常呈現<strong>群聚</strong>的型態，而非彼此獨立。</p>
+<p>如果我們在績效分析中，把每一個極端點都當成一筆獨立樣本，就會產生一個潛在偏誤：</p>
+<p>同一個市場事件（例如：一次避險需求爆發），可能在 2–3
+天內連續觸發極端訊號，卻被重複計入績效統計中，
+這樣會導致樣本數被放大，Sharpe Ratio 被高估。</p>
+<p>在進入事件研究之前，有必要先處理這個「事件重複計算」的問題。因此，我引入<strong>Event
+Window</strong>概念。</p>
+<div class="note info">
+            <p><strong>Event Window</strong> 的設計邏輯</p><p>當某一天的指標滿足 ∣ 𝑍𝑡 ∣ &gt; threshold 時，視為事件候選日。接下來的<span class="math inline"><em>w</em></span> 個交易日（ShockWindow）：</p><ul><li>僅保留 Z-score 絕對值最大的那一天作為「事件日」，其餘極端點視為同一事件的延續，不重複計算。</li></ul><p>這樣的設計，能確保：</p><ul><li>每一筆樣本對應一個獨立市場衝擊，避免因連續高波動而高估效果。</li></ul><p>本研究主要使用 Shock Window =3，在避免重複計算與保留足夠樣本之間取得平衡。</p>
+          </div>
+<h4 id="預測視窗">預測視窗</h4>
+<p>本研究考察事件發生後不同持有期間的報酬表現，以觀察報酬隨時間的累積效應：</p>
+<p>考察區間：1 日、3 日、5 日、7 日。</p>
+<hr />
+<h3 id="核心結果時間傳導特性">3. 核心結果：時間傳導特性</h3>
+<h4 id="一-otm-volume-pcr-delta延遲但持續的影響">(一) OTM Volume PCR
+Delta：延遲但持續的影響</h4>
+<p>根據 Event Study 結果顯示，這類指標展現出顯著的「逐步發酵」特性：</p>
+<p>下圖比較 OTM Volume PCR Delta 在不同預測視窗（1、3、5、7
+日）下的平均報酬與風險調整後表現。</p>
+<p><img src="../assets/otmVPCRDaycompare1.5.png" /></p>
+<div class="note info">
+            <p><strong>圖表解讀：</strong></p><ul><li><p>在 1 日視窗： 極端狀態已能觀察到明顯高於 Normal 的 Sharpe ratio與平均報酬，顯示該訊號具有即時反應市場的特性</p></li><li><p>在 3–5 日視窗： 極端負向組的 Sharpe ratio與平均報酬達到高點，顯示市場存在短期延續效果</p></li><li><p>在 7 日視窗： 極端與 Normal的差距開始收斂，事件影響逐步被市場吸收。</p></li></ul><p>整體來看，OTM Volume PCR Delta 的影響最集中於 3–5 日區間。</p>
+          </div>
+<p>在引入 Event Window 以避免連續訊號重複計算後，Weekly OTM Volume PCR
+Delta 的極端變化仍然展現出明顯優於正常狀態的風險調整後表現。</p>
+<p>儘管在樣本數有限的情況下，傳統的非母數檢定未顯示穩定的統計顯著性，但其
+Sharpe Ratio 在多數預測視窗（特別是 3–5
+日）仍顯著高於正常區間，顯示該指標更可能反映 事件型
+市場狀態的結構差異，而非穩定的平均報酬偏態。</p>
+<details>
+<summary>
+<b> 點擊展開：rolling 回測結果</b>
+</summary>
+<h3
+id="台股週選擇權事件研究彙整表-shockwin3-threshold1.25">台股週選擇權事件研究彙整表
+(ShockWin=3, Threshold=1.25)</h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 15%" />
+<col style="width: 12%" />
+<col style="width: 15%" />
+<col style="width: 15%" />
+<col style="width: 15%" />
+<col style="width: 15%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">因子名稱</th>
+<th style="text-align: center;">持有期</th>
+<th style="text-align: left;">訊號類別</th>
+<th style="text-align: center;">年化報酬</th>
+<th style="text-align: center;">夏普比率 (Sharpe)</th>
+<th style="text-align: center;">勝率</th>
+<th style="text-align: center;">樣本數 (n)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>1. OI PCR Delta</strong></td>
+<td style="text-align: center;">1d</td>
+<td style="text-align: left;">Extreme High</td>
+<td style="text-align: center;">45.93%</td>
+<td style="text-align: center;"><strong>3.52</strong></td>
+<td style="text-align: center;">63.24%</td>
+<td style="text-align: center;">68</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;">Extreme Low</td>
+<td style="text-align: center;">11.62%</td>
+<td style="text-align: center;">0.53</td>
+<td style="text-align: center;">54.44%</td>
+<td style="text-align: center;">90</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;">Normal</td>
+<td style="text-align: center;">12.55%</td>
+<td style="text-align: center;">0.70</td>
+<td style="text-align: center;">55.12%</td>
+<td style="text-align: center;">1709</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;">3d</td>
+<td style="text-align: left;">Extreme High</td>
+<td style="text-align: center;">-5.54%</td>
+<td style="text-align: center;">-0.19</td>
+<td style="text-align: center;">54.41%</td>
+<td style="text-align: center;">68</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;">Extreme Low</td>
+<td style="text-align: center;">88.79%</td>
+<td style="text-align: center;">2.79</td>
+<td style="text-align: center;">58.89%</td>
+<td style="text-align: center;">90</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;">Normal</td>
+<td style="text-align: center;">45.06%</td>
+<td style="text-align: center;">1.45</td>
+<td style="text-align: center;">57.64%</td>
+<td style="text-align: center;">1707</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: center;">5d</td>
+<td style="text-align: left;">Extreme High</td>
+<td style="text-align: center;">108.32%</td>
+<td style="text-align: center;"><strong>3.04</strong></td>
+<td style="text-align: center;">67.65%</td>
+<td style="text-align: center;">68</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;">Extreme Low</td>
+<td style="text-align: center;">89.81%</td>
+<td style="text-align: center;">2.21</td>
+<td style="text-align: center;">52.22%</td>
+<td style="text-align: center;">90</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;">Normal</td>
+<td style="text-align: center;">81.73%</td>
+<td style="text-align: center;">2.03</td>
+<td style="text-align: center;">59.71%</td>
+<td style="text-align: center;">1705</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;">7d</td>
+<td style="text-align: left;">Extreme High</td>
+<td style="text-align: center;">107.21%</td>
+<td style="text-align: center;">2.58</td>
+<td style="text-align: center;">67.65%</td>
+<td style="text-align: center;">68</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;">Extreme Low</td>
+<td style="text-align: center;">110.04%</td>
+<td style="text-align: center;">2.38</td>
+<td style="text-align: center;">57.78%</td>
+<td style="text-align: center;">90</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;">Normal</td>
+<td style="text-align: center;">122.26%</td>
+<td style="text-align: center;">2.55</td>
+<td style="text-align: center;">61.48%</td>
+<td style="text-align: center;">1703</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>2. OTM Vol PCR Delta</strong></td>
+<td style="text-align: center;">1d</td>
+<td style="text-align: left;">Extreme High</td>
+<td style="text-align: center;">52.52%</td>
+<td style="text-align: center;"><strong>4.49</strong></td>
+<td style="text-align: center;">65.79%</td>
+<td style="text-align: center;">38</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;">Extreme Low</td>
+<td style="text-align: center;">74.00%</td>
+<td style="text-align: center;"><strong>3.93</strong></td>
+<td style="text-align: center;">52.00%</td>
+<td style="text-align: center;">25</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;">Normal</td>
+<td style="text-align: center;">12.07%</td>
+<td style="text-align: center;">0.67</td>
+<td style="text-align: center;">55.21%</td>
+<td style="text-align: center;">1804</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;">3d</td>
+<td style="text-align: left;">Extreme High</td>
+<td style="text-align: center;">27.43%</td>
+<td style="text-align: center;">0.65</td>
+<td style="text-align: center;">60.53%</td>
+<td style="text-align: center;">38</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;">Extreme Low</td>
+<td style="text-align: center;"><strong>210.68%</strong></td>
+<td style="text-align: center;"><strong>6.40</strong></td>
+<td style="text-align: center;">68.00%</td>
+<td style="text-align: center;">25</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;">Normal</td>
+<td style="text-align: center;">43.41%</td>
+<td style="text-align: center;">1.41</td>
+<td style="text-align: center;">57.38%</td>
+<td style="text-align: center;">1802</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: center;">5d</td>
+<td style="text-align: left;">Extreme High</td>
+<td style="text-align: center;"><strong>140.84%</strong></td>
+<td style="text-align: center;"><strong>3.29</strong></td>
+<td style="text-align: center;">65.79%</td>
+<td style="text-align: center;">38</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;">Extreme Low</td>
+<td style="text-align: center;"><strong>222.80%</strong></td>
+<td style="text-align: center;"><strong>5.67</strong></td>
+<td style="text-align: center;">60.00%</td>
+<td style="text-align: center;">25</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;">Normal</td>
+<td style="text-align: center;">79.94%</td>
+<td style="text-align: center;">2.00</td>
+<td style="text-align: center;">59.50%</td>
+<td style="text-align: center;">1800</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;">7d</td>
+<td style="text-align: left;">Extreme High</td>
+<td style="text-align: center;">90.49%</td>
+<td style="text-align: center;">1.96</td>
+<td style="text-align: center;">52.63%</td>
+<td style="text-align: center;">38</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;">Extreme Low</td>
+<td style="text-align: center;"><strong>257.83%</strong></td>
+<td style="text-align: center;"><strong>5.52</strong></td>
+<td style="text-align: center;">68.00%</td>
+<td style="text-align: center;">25</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;">Normal</td>
+<td style="text-align: center;">119.87%</td>
+<td style="text-align: center;">2.52</td>
+<td style="text-align: center;">61.62%</td>
+<td style="text-align: center;">1798</td>
+</tr>
+</tbody>
+</table>
+<h3
+id="台股週選擇權事件研究彙整表-shockwin3-threshold1.5">台股週選擇權事件研究彙整表
+(ShockWin=3, Threshold=1.5)</h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 15%" />
+<col style="width: 12%" />
+<col style="width: 15%" />
+<col style="width: 15%" />
+<col style="width: 15%" />
+<col style="width: 15%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">因子名稱</th>
+<th style="text-align: center;">持有期</th>
+<th style="text-align: left;">訊號類別</th>
+<th style="text-align: center;">年化報酬</th>
+<th style="text-align: center;">夏普比率 (Sharpe)</th>
+<th style="text-align: center;">勝率</th>
+<th style="text-align: center;">樣本數 (n)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>1. OI PCR Delta</strong></td>
+<td style="text-align: center;">1d</td>
+<td style="text-align: left;">Extreme High</td>
+<td style="text-align: center;">45.93%</td>
+<td style="text-align: center;"><strong>3.52</strong></td>
+<td style="text-align: center;">63.24%</td>
+<td style="text-align: center;">68</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;">Extreme Low</td>
+<td style="text-align: center;">11.62%</td>
+<td style="text-align: center;">0.53</td>
+<td style="text-align: center;">54.44%</td>
+<td style="text-align: center;">90</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;"><strong>Normal</strong></td>
+<td style="text-align: center;">12.55%</td>
+<td style="text-align: center;">0.70</td>
+<td style="text-align: center;">55.12%</td>
+<td style="text-align: center;">1709</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;">3d</td>
+<td style="text-align: left;">Extreme High</td>
+<td style="text-align: center;">-5.54%</td>
+<td style="text-align: center;">-0.19</td>
+<td style="text-align: center;">54.41%</td>
+<td style="text-align: center;">68</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;">Extreme Low</td>
+<td style="text-align: center;">88.79%</td>
+<td style="text-align: center;">2.79</td>
+<td style="text-align: center;">58.89%</td>
+<td style="text-align: center;">90</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;"><strong>Normal</strong></td>
+<td style="text-align: center;">45.06%</td>
+<td style="text-align: center;">1.45</td>
+<td style="text-align: center;">57.64%</td>
+<td style="text-align: center;">1707</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: center;">5d</td>
+<td style="text-align: left;">Extreme High</td>
+<td style="text-align: center;">108.32%</td>
+<td style="text-align: center;"><strong>3.04</strong></td>
+<td style="text-align: center;">67.65%</td>
+<td style="text-align: center;">68</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;">Extreme Low</td>
+<td style="text-align: center;">89.81%</td>
+<td style="text-align: center;">2.21</td>
+<td style="text-align: center;">52.22%</td>
+<td style="text-align: center;">90</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;"><strong>Normal</strong></td>
+<td style="text-align: center;">81.73%</td>
+<td style="text-align: center;">2.03</td>
+<td style="text-align: center;">59.71%</td>
+<td style="text-align: center;">1705</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;">7d</td>
+<td style="text-align: left;">Extreme High</td>
+<td style="text-align: center;">107.21%</td>
+<td style="text-align: center;">2.58</td>
+<td style="text-align: center;">67.65%</td>
+<td style="text-align: center;">68</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;">Extreme Low</td>
+<td style="text-align: center;">110.04%</td>
+<td style="text-align: center;">2.38</td>
+<td style="text-align: center;">57.78%</td>
+<td style="text-align: center;">90</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;"><strong>Normal</strong></td>
+<td style="text-align: center;">122.26%</td>
+<td style="text-align: center;">2.55</td>
+<td style="text-align: center;">61.48%</td>
+<td style="text-align: center;">1703</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: left;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>2. OTM Vol PCR Delta</strong></td>
+<td style="text-align: center;">1d</td>
+<td style="text-align: left;">Extreme High</td>
+<td style="text-align: center;">31.09%</td>
+<td style="text-align: center;">2.74</td>
+<td style="text-align: center;">61.29%</td>
+<td style="text-align: center;">31</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;">Extreme Low</td>
+<td style="text-align: center;">117.23%</td>
+<td style="text-align: center;"><strong>5.61</strong></td>
+<td style="text-align: center;">58.82%</td>
+<td style="text-align: center;">17</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;"><strong>Normal</strong></td>
+<td style="text-align: center;">12.46%</td>
+<td style="text-align: center;">0.69</td>
+<td style="text-align: center;">55.25%</td>
+<td style="text-align: center;">1819</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: center;">3d</td>
+<td style="text-align: left;">Extreme High</td>
+<td style="text-align: center;">66.62%</td>
+<td style="text-align: center;">3.38</td>
+<td style="text-align: center;">58.06%</td>
+<td style="text-align: center;">31</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;">Extreme Low</td>
+<td style="text-align: center;"><strong>303.59%</strong></td>
+<td style="text-align: center;"><strong>8.67</strong></td>
+<td style="text-align: center;">76.47%</td>
+<td style="text-align: center;">17</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;"><strong>Normal</strong></td>
+<td style="text-align: center;">42.55%</td>
+<td style="text-align: center;">1.36</td>
+<td style="text-align: center;">57.40%</td>
+<td style="text-align: center;">1817</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;">5d</td>
+<td style="text-align: left;">Extreme High</td>
+<td style="text-align: center;">185.56%</td>
+<td style="text-align: center;"><strong>6.09</strong></td>
+<td style="text-align: center;">64.52%</td>
+<td style="text-align: center;">31</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;">Extreme Low</td>
+<td style="text-align: center;"><strong>362.08%</strong></td>
+<td style="text-align: center;"><strong>8.56</strong></td>
+<td style="text-align: center;">64.71%</td>
+<td style="text-align: center;">17</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;"><strong>Normal</strong></td>
+<td style="text-align: center;">78.73%</td>
+<td style="text-align: center;">1.96</td>
+<td style="text-align: center;">59.50%</td>
+<td style="text-align: center;">1815</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: center;">7d</td>
+<td style="text-align: left;">Extreme High</td>
+<td style="text-align: center;">136.94%</td>
+<td style="text-align: center;">3.62</td>
+<td style="text-align: center;">54.84%</td>
+<td style="text-align: center;">31</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;">Extreme Low</td>
+<td style="text-align: center;"><strong>370.82%</strong></td>
+<td style="text-align: center;"><strong>7.38</strong></td>
+<td style="text-align: center;">76.47%</td>
+<td style="text-align: center;">17</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: left;"><strong>Normal</strong></td>
+<td style="text-align: center;">118.51%</td>
+<td style="text-align: center;">2.48</td>
+<td style="text-align: center;">61.50%</td>
+<td style="text-align: center;">1813</td>
+</tr>
+</tbody>
+</table>
+</details>
+<h4 id="二-指標對照oi-與整體-volume">(二) 指標對照：OI 與整體
+Volume</h4>
+<ul>
+<li><strong>OI PCR
+Delta</strong>：效果反應較快，但隨時間累積的動能較弱，符合「部位調整（Positioning）」的直覺。</li>
+<li><strong>整體 Volume PCR Delta</strong>：表現較不穩定，證實
+<strong>OTM 篩選</strong> 對於捕捉「尾端結構」至關重要。</li>
+</ul>
+<hr />
+<h3 id="結構拆解dominance-test-put-vs-call">4. 結構拆解：Dominance Test
+(Put vs Call)</h3>
+<p>為進一步釐清訊號來源，研究將極端事件依結構拆分為
+<strong>買權主導</strong> 與 <strong>賣權主導</strong>：</p>
+<table>
+<colgroup>
+<col style="width: 13%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">策略分組</th>
+<th style="text-align: center;">樣本數</th>
+<th style="text-align: center;">1d Return</th>
+<th style="text-align: center;">3d Return</th>
+<th style="text-align: center;">5d Return</th>
+<th style="text-align: center;">7d Return</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Call Dominant</strong> (Call Δ
+&gt; Put Δ)</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">-0.02%</td>
+<td style="text-align: center;">0.01%</td>
+<td style="text-align: center;">0.40%</td>
+<td style="text-align: center;">0.16%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Put Dominant</strong> (Put Δ ≥
+Call Δ)</td>
+<td style="text-align: center;">43</td>
+<td style="text-align: center;">-0.02%</td>
+<td style="text-align: center;"><strong>0.27%</strong></td>
+<td style="text-align: center;"><strong>0.61%</strong></td>
+<td style="text-align: center;"><strong>0.67%</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>註記：</strong></p>
+</blockquote>
+<blockquote>
+<ol type="1">
+<li>Group 1: <span
+class="math inline"><em>C</em><em>a</em><em>l</em><em>l</em><em>Δ</em> &gt; <em>P</em><em>u</em><em>t</em><em>Δ</em></span>
+(買權 Delta 較大)</li>
+<li>Group 2: <span
+class="math inline"><em>P</em><em>u</em><em>t</em><em>Δ</em> ≥ <em>C</em><em>a</em><em>l</em><em>l</em><em>Δ</em></span>
+(賣權 Delta 較大或相等)</li>
+</ol>
+</blockquote>
+<p><img src="../assets/dominant%20test.png" /></p>
+<div class="note success">
+            <p><strong>結果解讀</strong></p><p>從結果可觀察到兩個清楚但需要謹慎解讀的現象：</p><p>在所有被識別為 OTM Volume PCR 極端事件中，絕大多數屬於 Put Dominant。這代表 PCR 的異常下降，並非主要來自買權成交量的爆發，而更常是<strong>價外賣權成交量的快速萎縮</strong>。 Put Dominant結構下，報酬呈現較一致的中短期延續性 在 3d–7d 的持有期間內，Put Dominant組別的平均報酬呈現穩定正向，且 Sharpe 表現亦顯著高於 Call Dominant。相對地，Call Dominant因樣本極少，結果不具備可解釋的統計穩定性，僅作為結構對照。以下是我認為較符合的經濟意涵：</p><p>1.原本集中於價外 Put 的避險交易快速退場</p><p>2.PCR 下降是由 恐慌性避險動能衰竭 所驅動。</p>
+          </div>
+<h3 id="事件前後比較">4. 事件前後比較：</h3>
+<p><img src="../assets/ES_PutD.png" /></p>
+<div class="note success">
+            <p><strong>關鍵解讀：</strong><br />由上圖可以看到 :</p><p>一、 OTM Volume PCR Delta的下降，代表價外賣權相對於價外買權的成交量動能明顯減弱。從成交結構的角度來看，這類事件通常發生於市場避險需求快速降溫的時段，顯示原本集中於價外賣權的交易活動出現明顯收斂。此現象未必直接代表多頭立場的形成，但可視為市場情緒由高度防禦狀態轉向中性或重新配置的訊號。</p><p>二、 Event Study結果顯示，在訊號觸發後，市場報酬並非一次性反應，而是呈現出逐步消化的特性。在多數事件中，累積報酬曲線於 <spanclass="math inline"><em>t</em> = 0</span>之後持續向上，且效果可延續至數週，顯示此類訊號較接近「狀態轉換」而非短暫噪音。這也與前述多視窗（3–7日）分析中，該指標於中短期預測視窗表現相對較佳的結果一致。</p><p>三、 搭配日內振幅（IntradayRange）的觀察，可以發現訊號觸發前後，市場波動水準往往出現下降趨勢。這代表該類事件不僅影響價格方向，也可能伴隨風險結構的改變，使市場進入「較低波動」的狀態。此特性對於後續策略設計（無論是方向性或波動相關策略）具有參考價值。</p>
+          </div>
+<hr />
+<h3 id="階段三小結研究意義">5. 階段三小結：研究意義</h3>
+<p>第三階段的結果顯示，OTM 成交量 PCR
+的極端變化，並不是單純反映當天市場情緒，而是常常出現在市場行為即將轉變的關鍵時刻。</p>
+<p>具體來說，當這類訊號出現時，市場後續數天的走勢往往不會立刻結束，而是呈現出一段相對穩定的延續反應。這表示該指標較適合用來判斷「接下來幾天市場環境是否偏向有利」，而不是用來預測隔日漲跌。</p>
+<p>因此，OTM Volume PCR Delta
+的主要價值，在於協助辨識短期市場狀態的轉換，作為交易與風險判斷的輔助依據，而非單獨使用的即時買賣訊號。</p>
+<hr />
+<h2 id="結論與展望">▌結論與展望</h2>
+<h3 id="總結">1.總結</h3>
+<p>最後想用這張圖做總結，這是我寫的一個策略回測，測試期間是2017年到2026年，標的是<strong>台灣加權指數(灰線)</strong>，策略是當<strong>價外成交量Put
+Call Ratio 變化量絕對值</strong>大於 1.5
+倍標準差時，隔天開盤就進場買進，藍色是三天後平倉，綠色是五天後平倉。</p>
+<p>可以發現，綠線明顯更貼齊灰線，並明顯高於藍線，此外最重要的是，綠線的最大回徹明顯小於灰線，在市場大跌時，報酬沒有顯著的變動，而犧牲的是它的獲利能力。</p>
+<p>這個結果相當符合之前的各種檢定，價外成交量Put Call Ratio 變化量
+顯著變化時，3到5天內的市場報酬是相對穩定的，且波動度並沒有顯著的變化。</p>
+<p><img src="../assets/OTMPCRStrategy_rolling.png" /></p>
+<hr />
+<h3 id="未來展望">2.未來展望</h3>
+<p>基於本研究對 OTM 選擇權 PCR
+極端事件的實證結果，未來可從以下兩個方向進一步延伸：</p>
+<ul>
+<li><p>可嘗試結合更多市場風險相關指標，例如隱含波動率的變化，觀察在極端事件前後，市場是否同時出現風險定價的調整，進一步補強對市場狀態轉換的理解。</p></li>
+<li><p>檢驗其他成熟指數選擇權市場（如 S&amp;P 500
+指數選擇權），或流動性較高的個股選擇權標的，以比較不同市場制度、參與者結構與流動性條件下，PCR訊號的表現差異與穩健程度。</p></li>
+</ul>
+<hr />
+<h2 id="結語">▌結語</h2>
+<p>從長期績效曲線，以及各種檢定可發現，OTM Vol PCR
+極端事件所構成的策略雖非追求市場最高報酬，但能在多空循環中穩定累積報酬並有效抑制回撤，顯示其核心價值在於提供一種具備防禦性的結構型
+Alpha，而非短期博弈型訊號。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E8%A8%80introduction"><span class="nav-number">1.</span> <span class="nav-text">▌前言（Introduction）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A0%94%E7%A9%B6%E8%B3%87%E6%96%99"><span class="nav-number">1.1.</span> <span class="nav-text">1. 研究資料</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%87%E6%A8%99%E5%AE%9A%E7%BE%A9%E8%88%87%E8%83%8C%E6%99%AF%E7%9F%A5%E8%AD%98"><span class="nav-number">1.2.</span> <span class="nav-text">2. 指標定義與背景知識</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#putcall-ratiopcr"><span class="nav-number">1.2.1.</span> <span class="nav-text">Put–Call Ratio（PCR）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%95%B8%E6%93%9A%E9%A1%9E%E5%9E%8B%E8%88%87%E5%83%B9%E4%BD%8D%E5%88%86%E9%A1%9E"><span class="nav-number">1.2.2.</span> <span class="nav-text">數據類型與價位分類</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9A%8E%E6%AE%B5%E4%B8%80%E7%B5%B1%E8%A8%88%E6%AA%A2%E5%AE%9A"><span class="nav-number">2.</span> <span class="nav-text">▌階段一：統計檢定</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A0%94%E7%A9%B6%E7%9B%AE%E7%9A%84"><span class="nav-number">2.1.</span> <span class="nav-text">1. 研究目的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%A6%E9%A9%97%E8%A8%AD%E8%A8%88"><span class="nav-number">2.2.</span> <span class="nav-text">2. 實驗設計</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%87%E6%A8%99%E5%88%86%E9%A1%9E%E9%82%8F%E8%BC%AF"><span class="nav-number">2.2.1.</span> <span class="nav-text">🛠️ 指標分類邏輯</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#step-1%E8%A8%88%E7%AE%97%E7%B5%B1%E8%A8%88%E9%87%8F-baseline-statistics"><span class="nav-number">2.2.1.1.</span> <span class="nav-text">Step 1：計算統計量(Baseline Statistics)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#step-2%E8%A8%AD%E5%AE%9A%E6%A5%B5%E7%AB%AF%E9%96%80%E6%AA%BB-threshold"><span class="nav-number">2.2.1.2.</span> <span class="nav-text">Step 2：設定極端門檻(Threshold)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#step-3%E5%88%86%E9%A1%9E%E8%A6%8F%E5%89%87-classification-rule"><span class="nav-number">2.2.1.3.</span> <span class="nav-text">Step 3：分類規則(Classification Rule)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%81%B8%E6%93%87%E6%AC%8A%E6%8C%87%E6%A8%99-t-%E6%AA%A2%E5%AE%9A%E5%BD%99%E6%95%B4%E8%A1%A8-threshold-1.5"><span class="nav-number">2.2.2.</span> <span class="nav-text">選擇權指標 t 檢定彙整表
+(Threshold &#x3D; 1.5)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9A%8E%E6%AE%B5%E4%B8%80%E6%96%B9%E6%B3%95%E7%9A%84%E9%99%90%E5%88%B6"><span class="nav-number">2.2.3.</span> <span class="nav-text">3. 階段一方法的限制</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9A%8E%E6%AE%B5%E4%BA%8C%E7%B5%90%E6%A7%8B%E5%8C%96%E8%88%87%E6%99%82%E8%AE%8A%E5%88%86%E6%9E%90weekly-monthly-rolling-standardization"><span class="nav-number">2.3.</span> <span class="nav-text">▌階段二：結構化與時變分析（Weekly
+&#x2F; Monthly × Rolling Standardization）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A0%94%E7%A9%B6%E5%8B%95%E6%A9%9F"><span class="nav-number">2.3.1.</span> <span class="nav-text">1. 研究動機</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E8%A8%AD%E8%A8%88"><span class="nav-number">2.3.2.</span> <span class="nav-text">2. 方法設計</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BE%9D%E9%81%B8%E6%93%87%E6%AC%8A%E5%88%B0%E6%9C%9F%E5%9E%8B%E6%85%8B%E5%8D%80%E5%88%86strict-separation"><span class="nav-number">2.3.2.1.</span> <span class="nav-text">依選擇權到期型態區分（Strict
+Separation）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#rolling-%E6%A8%99%E6%BA%96%E5%8C%96time-varying-normalization"><span class="nav-number">2.3.2.2.</span> <span class="nav-text">Rolling
+標準化（Time-Varying Normalization）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E7%B5%90%E6%9E%9C%E8%88%87%E8%A7%A3%E8%AE%80"><span class="nav-number">2.4.</span> <span class="nav-text">3. 核心結果與解讀</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80-weekly-volume-pcr-delta"><span class="nav-number">2.4.1.</span> <span class="nav-text">(一) Weekly × Volume PCR
+Delta：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C-weekly-oi-pcr-delta"><span class="nav-number">2.4.2.</span> <span class="nav-text">(二) Weekly × OI PCR Delta：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89-monthly-%E9%81%B8%E6%93%87%E6%AC%8A%E6%95%88%E6%9E%9C%E9%A1%AF%E8%91%97%E7%A8%80%E9%87%8B"><span class="nav-number">2.4.3.</span> <span class="nav-text">(三) Monthly
+選擇權：效果顯著稀釋</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%B1%E9%81%B8%E6%93%87%E6%AC%8A%E6%BB%BE%E5%8B%95%E6%B8%AC%E8%A9%A6%E5%9B%9E%E6%B8%AC%E6%95%B8%E6%93%9A-weekly-options---rolling-test"><span class="nav-number">2.4.4.</span> <span class="nav-text">週選擇權滾動測試回測數據
+(Weekly Options - Rolling Test)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%88%E9%81%B8%E6%93%87%E6%AC%8A%E6%BB%BE%E5%8B%95%E6%B8%AC%E8%A9%A6%E5%9B%9E%E6%B8%AC%E6%95%B8%E6%93%9A-monthly-options---rolling-test"><span class="nav-number">2.4.5.</span> <span class="nav-text">月選擇權滾動測試回測數據
+(Monthly Options - Rolling Test)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9A%8E%E6%AE%B5%E4%BA%8C%E5%B0%8F%E7%B5%90"><span class="nav-number">2.4.6.</span> <span class="nav-text">4. 階段二小結</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9A%8E%E6%AE%B5%E4%B8%89event-study%E4%BA%8B%E4%BB%B6%E7%A0%94%E7%A9%B6%E8%88%87%E6%99%82%E9%96%93%E5%82%B3%E5%B0%8E%E5%88%86%E6%9E%90"><span class="nav-number">2.5.</span> <span class="nav-text">▌階段三：Event
+Study（事件研究與時間傳導分析）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A0%94%E7%A9%B6%E5%8B%95%E6%A9%9F-1"><span class="nav-number">2.5.1.</span> <span class="nav-text">1. 研究動機</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E5%AE%9A%E7%BE%A9%E8%88%87%E5%AF%A6%E9%A9%97%E8%A8%AD%E8%A8%88"><span class="nav-number">2.5.2.</span> <span class="nav-text">2. 事件定義與實驗設計</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E5%AE%9A%E7%BE%A9event"><span class="nav-number">2.5.2.1.</span> <span class="nav-text">事件定義（Event）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A0%90%E6%B8%AC%E8%A6%96%E7%AA%97"><span class="nav-number">2.5.2.2.</span> <span class="nav-text">預測視窗</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E7%B5%90%E6%9E%9C%E6%99%82%E9%96%93%E5%82%B3%E5%B0%8E%E7%89%B9%E6%80%A7"><span class="nav-number">2.5.3.</span> <span class="nav-text">3. 核心結果：時間傳導特性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%80-otm-volume-pcr-delta%E5%BB%B6%E9%81%B2%E4%BD%86%E6%8C%81%E7%BA%8C%E7%9A%84%E5%BD%B1%E9%9F%BF"><span class="nav-number">2.5.3.1.</span> <span class="nav-text">(一) OTM Volume PCR
+Delta：延遲但持續的影響</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%B0%E8%82%A1%E9%80%B1%E9%81%B8%E6%93%87%E6%AC%8A%E4%BA%8B%E4%BB%B6%E7%A0%94%E7%A9%B6%E5%BD%99%E6%95%B4%E8%A1%A8-shockwin3-threshold1.25"><span class="nav-number">2.5.4.</span> <span class="nav-text">台股週選擇權事件研究彙整表
+(ShockWin&#x3D;3, Threshold&#x3D;1.25)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%B0%E8%82%A1%E9%80%B1%E9%81%B8%E6%93%87%E6%AC%8A%E4%BA%8B%E4%BB%B6%E7%A0%94%E7%A9%B6%E5%BD%99%E6%95%B4%E8%A1%A8-shockwin3-threshold1.5"><span class="nav-number">2.5.5.</span> <span class="nav-text">台股週選擇權事件研究彙整表
+(ShockWin&#x3D;3, Threshold&#x3D;1.5)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%8C-%E6%8C%87%E6%A8%99%E5%B0%8D%E7%85%A7oi-%E8%88%87%E6%95%B4%E9%AB%94-volume"><span class="nav-number">2.5.5.1.</span> <span class="nav-text">(二) 指標對照：OI 與整體
+Volume</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B5%90%E6%A7%8B%E6%8B%86%E8%A7%A3dominance-test-put-vs-call"><span class="nav-number">2.5.6.</span> <span class="nav-text">4. 結構拆解：Dominance Test
+(Put vs Call)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E5%89%8D%E5%BE%8C%E6%AF%94%E8%BC%83"><span class="nav-number">2.5.7.</span> <span class="nav-text">4. 事件前後比較：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9A%8E%E6%AE%B5%E4%B8%89%E5%B0%8F%E7%B5%90%E7%A0%94%E7%A9%B6%E6%84%8F%E7%BE%A9"><span class="nav-number">2.5.8.</span> <span class="nav-text">5. 階段三小結：研究意義</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B5%90%E8%AB%96%E8%88%87%E5%B1%95%E6%9C%9B"><span class="nav-number">2.6.</span> <span class="nav-text">▌結論與展望</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B8%BD%E7%B5%90"><span class="nav-number">2.6.1.</span> <span class="nav-text">1.總結</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AA%E4%BE%86%E5%B1%95%E6%9C%9B"><span class="nav-number">2.6.2.</span> <span class="nav-text">2.未來展望</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B5%90%E8%AA%9E"><span class="nav-number">2.7.</span> <span class="nav-text">▌結語</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Hankdd"
+      src="/images/%E6%AD%90%E7%88%BE%E9%BA%A5%E7%89%B9.jpg">
+  <p class="site-author-name" itemprop="name">Hankdd</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">1</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Hankkdd" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Hankkdd" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/hank940429@gmail.com" title="E-Mail → hank940429@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hankdd</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
