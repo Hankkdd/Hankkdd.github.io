@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Mulish:300,300italic,400,400italic,700,700italic|Lato:300,300italic,400,400italic,700,700italic|Noto Serif SC:300,300italic,400,400italic,700,700italic|Inconsolata:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"hankkdd.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Hankdd&#39;s Blog">
+<meta property="og:url" content="https://hankkdd.github.io/index.html">
+<meta property="og:site_name" content="Hankdd&#39;s Blog">
+<meta property="og:locale" content="en_US">
+<meta property="article:author" content="Hankdd">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://hankkdd.github.io/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : true,
+    isPost : false,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Hankdd's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hankdd's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content index posts-expand">
+            
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://hankkdd.github.io/0509/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E6%AD%90%E7%88%BE%E9%BA%A5%E7%89%B9.jpg">
+      <meta itemprop="name" content="Hankdd">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hankdd's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/0509/" class="post-title-link" itemprop="url">509</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2026-05-08 01:09:16" itemprop="dateCreated datePublished" datetime="2026-05-08T01:09:16+00:00">2026-05-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2026-05-07 17:11:06" itemprop="dateModified" datetime="2026-05-07T17:11:06+00:00">2026-05-07</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="graphrag-pykeen-gpm-報告整理">GraphRAG + PyKEEN + GPM
+報告整理</h1>
+<h2 id="研究摘要">研究摘要</h2>
+<p>本專題想做的是：使用 10-K 財報文字建立 GraphRAG knowledge graph，再用
+PyKEEN 將 KG 轉成 semantic embedding，最後把 GraphRAG / PyKEEN
+產生的股票語意關係提供給 GPM 類型的 portfolio model，研究財報 KG
+是否能輔助股票交易與投資組合配置。</p>
+<p>目前確定整理與使用的通用主軸：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">10-K 財報文字</span><br><span class="line">-&gt; GraphRAG 財報 KG</span><br><span class="line">-&gt; PyKEEN KG embedding</span><br><span class="line">-&gt; GraphRAG ticker-level graph</span><br><span class="line">-&gt; GPM 類型 portfolio model</span><br><span class="line">-&gt; 交易 / 選股設計由後續方案決定</span><br></pre></td></tr></table></figure>
+<h2 id="目前問題設定">目前問題設定</h2>
+<p>目前已實作版本的投資問題是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">universe size      = 28 檔股票</span><br><span class="line">selection size     = 5 檔股票</span><br><span class="line">price features     = close, high, low, volume</span><br><span class="line">time window        = 50 個交易日</span><br><span class="line">rebalance frequency = monthly</span><br><span class="line">commission fee     = 0.001</span><br></pre></td></tr></table></figure>
+<p>正式股票 universe：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">AAPL, AMGN, AMZN, AXP, BA, CAT, CRM, CSCO, CVX, DIS,</span><br><span class="line">GS, HD, IBM, JNJ, JPM, KO, MMM, MRK, MSFT, NKE,</span><br><span class="line">NVDA, PG, SHW, TRV, UNH, V, VZ, WMT</span><br></pre></td></tr></table></figure>
+<p>原本 Dow 30 裡面排除：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">MCD：沒有抓到對應 10-K。</span><br><span class="line">HON：有檔案，但文字內容不足，GraphRAG 很難抽出有效 entity / relationship。</span><br></pre></td></tr></table></figure>
+<p>目前研究問題可描述為：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">使用財報 KG 輔助股票籃子中的交易 / portfolio selection。</span><br></pre></td></tr></table></figure>
+<h2 id="重點一graphrag">重點一：GraphRAG</h2>
+<h3 id="graphrag-在本專題的角色">GraphRAG 在本專題的角色</h3>
+<p>GraphRAG 負責把非結構化的 10-K 財報文字轉成結構化的 knowledge
+graph。也就是先將財報文字轉換成可供模型使用的結構化訊號，再進一步串接到投資模型：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">entity       = 公司、產品、風險、市場、地區、財務概念、法規概念</span><br><span class="line">relationship = entity 之間的語意關係</span><br></pre></td></tr></table></figure>
+<p>例如財報裡可能會形成這種關係：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">APPLE INC -&gt; IPHONE</span><br><span class="line">APPLE INC -&gt; APP STORE</span><br><span class="line">VISA INC  -&gt; VISANET</span><br><span class="line">NVIDIA    -&gt; DATA CENTER</span><br><span class="line">JPMORGAN  -&gt; MARKET RISK</span><br></pre></td></tr></table></figure>
+<p>這些關係讓模型除了使用價格訊號，也能取得每家公司在財報語意上與產品、風險、市場、法規或財務概念的關聯。</p>
+<h3 id="graphrag-輸入">GraphRAG 輸入</h3>
+<p>GraphRAG 的輸入是每家公司 10-K 財報段落文字：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">financial_reports/&#123;ticker&#125;/*.txt</span><br></pre></td></tr></table></figure>
+<p>目前輸入規模：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">documents: 169 個財報段落</span><br><span class="line">text_units: 994 個 chunks</span><br></pre></td></tr></table></figure>
+<p>每個 <code>.txt</code> 會被整理成 GraphRAG input document，並保留
+ticker、section、source path 等 metadata，方便之後追溯 KG
+是從哪段財報來的。</p>
+<h3 id="graphrag-輸出">GraphRAG 輸出</h3>
+<p>目前主要產物：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">graphrag_project/output/entities.parquet</span><br><span class="line">graphrag_project/output/relationships.parquet</span><br><span class="line">graphrag_project/output/text_units.parquet</span><br><span class="line">graphrag_project/output/documents.parquet</span><br><span class="line">graphrag_project/output/communities.parquet</span><br></pre></td></tr></table></figure>
+<p>目前統計：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">entities.parquet:      8424 entities</span><br><span class="line">relationships.parquet: 4471 relationships</span><br><span class="line">text_units.parquet:     994 chunks</span><br><span class="line">documents.parquet:      169 documents</span><br><span class="line">communities.parquet:    542 communities</span><br></pre></td></tr></table></figure>
+<p>本研究實際餵進模型主線的是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">entities.parquet</span><br><span class="line">relationships.parquet</span><br></pre></td></tr></table></figure>
+<p><code>text_units.parquet</code> 和 <code>documents.parquet</code>
+主要用來追溯來源與檢查資料；<code>community_reports.parquet</code>
+不是目前 RL 模型的主要輸入。</p>
+<h3 id="community-report-的定位">Community Report 的定位</h3>
+<p>GraphRAG 的 community report 較適合自然語言查詢或 global
+search，例如產業風險整理。本專題的 RL 模型主要需要可轉成 tensor
+的結構化訊號：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">KG nodes</span><br><span class="line">KG edges</span><br><span class="line">edge weights</span><br><span class="line">relation types</span><br><span class="line">ticker-level graph</span><br></pre></td></tr></table></figure>
+<p>因此目前使用 GraphRAG 的核心 KG 結構，而不是使用自然語言 community
+summary 作為主要投資訊號。</p>
+<h3 id="ticker-level-graph">Ticker-Level Graph</h3>
+<p>財報 KG 通常不會直接抽成：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">公司 A -&gt; 公司 B</span><br></pre></td></tr></table></figure>
+<p>較常見的是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">公司 -&gt; 產品</span><br><span class="line">公司 -&gt; 風險</span><br><span class="line">公司 -&gt; 市場</span><br><span class="line">公司 -&gt; 地區</span><br><span class="line">公司 -&gt; 財務概念</span><br></pre></td></tr></table></figure>
+<p>所以本專題用 shared concept projection，把「共享概念」轉成股票之間的
+graph：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">公司 A -&gt; 概念 &lt;- 公司 B</span><br><span class="line">=&gt; 公司 A --shared_concept_type--&gt; 公司 B</span><br></pre></td></tr></table></figure>
+<p>例子：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">NVDA 和 MSFT 可能共享 AI / data center 概念。</span><br><span class="line">V 和 AXP 可能共享 payment network / competition 概念。</span><br><span class="line">JPM 和 GS 可能共享 financial services / market risk 概念。</span><br></pre></td></tr></table></figure>
+<p>目前 ticker graph：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">nodes: 28 stocks</span><br><span class="line">edges: 166</span><br><span class="line">relation types: 16</span><br><span class="line">kg embeddings: 28 x 128</span><br></pre></td></tr></table></figure>
+<p>GraphRAG 在模型中的貢獻可以總結為：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">把財報文字中的公司語意關係，轉成 GPM 可以使用的 ticker graph。</span><br></pre></td></tr></table></figure>
+<h2 id="重點二pykeen">重點二：PyKEEN</h2>
+<h3 id="pykeen-在本專題的角色">PyKEEN 在本專題的角色</h3>
+<p>PyKEEN 負責把 GraphRAG 抽出的 KG 轉成 entity embedding。GraphRAG
+給我們的是 graph 結構，PyKEEN 則把 graph 裡的 entity
+壓成向量，讓模型能使用每支股票在財報 KG 裡的語意位置。</p>
+<p>概念整理：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">GraphRAG = 建立財報 KG</span><br><span class="line">PyKEEN   = 學出 KG 裡 entity 的 semantic embedding</span><br></pre></td></tr></table></figure>
+<h3 id="從-graphrag-到-triples">從 GraphRAG 到 Triples</h3>
+<p>GraphRAG 的 relationships 會轉成 PyKEEN triples：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">head, relation, tail</span><br></pre></td></tr></table></figure>
+<p>因為目前 <code>relationships.parquet</code> 沒有明確的 relation type
+欄位，所以先用 relationship description 做 rule-based 粗分類：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">related_to</span><br><span class="line">risk_related</span><br><span class="line">financial_related</span><br><span class="line">product_related</span><br><span class="line">regulation_related</span><br><span class="line">geography_related</span><br><span class="line">market_related</span><br><span class="line">customer_supplier_related</span><br></pre></td></tr></table></figure>
+<p>目前 triples 統計：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">triples: 4423</span><br><span class="line">PyKEEN entities: 3228</span><br><span class="line">加入 inverse triples 後 relation 數: 16</span><br></pre></td></tr></table></figure>
+<h3 id="pykeen-模型">PyKEEN 模型</h3>
+<p>目前 PyKEEN 使用：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">model: ComplEx</span><br><span class="line">embedding_dim: 64</span><br><span class="line">epochs: 100</span><br><span class="line">batch_size: 256</span><br><span class="line">device: cuda</span><br></pre></td></tr></table></figure>
+<p>ComplEx 是複數 embedding，所以匯出時保留：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">64 維 real + 64 維 imaginary = 128 維實數 embedding</span><br></pre></td></tr></table></figure>
+<p>最後輸出 ticker 對齊後的 embedding：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">artifacts/pykeen/pykeen_entity_embeddings.csv</span><br><span class="line">shape: 28 x 130</span><br></pre></td></tr></table></figure>
+<p>其中：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ticker</span><br><span class="line">entity_title</span><br><span class="line">128 維 embedding</span><br></pre></td></tr></table></figure>
+<h3 id="pykeen-embedding-的意義">PyKEEN Embedding 的意義</h3>
+<p>PyKEEN embedding 不是價格訊號，也不是技術指標。它代表的是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">每支股票在財報 KG 語意空間中的位置。</span><br></pre></td></tr></table></figure>
+<p>也就是說，如果兩家公司在財報裡常連到相似的產品、風險、市場、法規或財務概念，它們的
+KG embedding 可能會比較接近。</p>
+<p>PyKEEN 在模型中的貢獻可以總結為：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">把 GraphRAG KG 中的語意結構，轉成每支股票可用的 semantic vector。</span><br></pre></td></tr></table></figure>
+<h2 id="重點三gpm">重點三：GPM</h2>
+<h3 id="gpm-在本專題的角色">GPM 在本專題的角色</h3>
+<p>GPM 是 Graph-based Portfolio Management 的方向，核心想法是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">portfolio model 不只看每支股票自己的價格序列，</span><br><span class="line">也看股票之間的 graph relation。</span><br></pre></td></tr></table></figure>
+<p>原始 GPM 的直覺流程：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">price temporal feature</span><br><span class="line">+ stock graph relation</span><br><span class="line">-&gt; portfolio weights / trading action</span><br></pre></td></tr></table></figure>
+<p>本專題目前先把 GPM 視為通用 portfolio model
+架構，不預設一定採用哪一個實作版本。重點是 GPM 需要同時處理：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">價格時間序列：</span><br><span class="line">  每支股票最近一段時間的 OHLCV。</span><br><span class="line"></span><br><span class="line">股票 graph：</span><br><span class="line">  股票之間的關聯性，可以由 GraphRAG ticker graph 提供。</span><br><span class="line"></span><br><span class="line">股票 embedding：</span><br><span class="line">  每支股票在 KG 語意空間中的位置，可以由 PyKEEN 提供。</span><br><span class="line"></span><br><span class="line">投資組合狀態：</span><br><span class="line">  上一期持倉 / last action。</span><br></pre></td></tr></table></figure>
+<h3 id="gpm-的通用輸入">GPM 的通用輸入</h3>
+<p>如果使用 GPM 類型模型，通常會需要這些 state / observation：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">價量 tensor:</span><br><span class="line">  shape = [features, stocks, time_window]</span><br><span class="line">  features = close, high, low, volume</span><br><span class="line">  stocks = 視方案而定，可能是全籃子，也可能是當次抽到的 5 檔</span><br><span class="line">  time_window = 50 trading days</span><br><span class="line"></span><br><span class="line">GraphRAG ticker graph:</span><br><span class="line">  edge_index</span><br><span class="line">  edge_type</span><br><span class="line">  edge_weight</span><br><span class="line"></span><br><span class="line">PyKEEN KG embedding:</span><br><span class="line">  shape = [28, 128]</span><br><span class="line"></span><br><span class="line">last_action:</span><br><span class="line">  上一期 portfolio weights</span><br></pre></td></tr></table></figure>
+<h3 id="graphrag-pykeen-要怎麼接進-gpm">GraphRAG / PyKEEN 要怎麼接進
+GPM</h3>
+<p>通用串接方式：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">price state</span><br><span class="line">[batch, features, stocks, time_window]</span><br><span class="line">        |</span><br><span class="line">        v</span><br><span class="line">Temporal CNN</span><br><span class="line">        |</span><br><span class="line">        v</span><br><span class="line">price temporal features</span><br><span class="line">        |</span><br><span class="line">        +-----------------------------+</span><br><span class="line">        |                             |</span><br><span class="line">        v                             v</span><br><span class="line">PyKEEN embedding                 GraphRAG ticker graph</span><br><span class="line">[stocks, 128]                    edge_index / edge_type / edge_weight</span><br><span class="line">        |                             |</span><br><span class="line">        v                             |</span><br><span class="line">KG feature adapter                    |</span><br><span class="line">        |                             |</span><br><span class="line">        v                             |</span><br><span class="line">KG semantic features                  |</span><br><span class="line">        |                             |</span><br><span class="line">        v                             |</span><br><span class="line">fusion / graph message passing        |</span><br><span class="line">        |                             |</span><br><span class="line">        v                             v</span><br><span class="line">GPM portfolio head</span><br><span class="line">        |</span><br><span class="line">        v</span><br><span class="line">cash + stock weights / trading action</span><br></pre></td></tr></table></figure>
+<p>說明：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Temporal CNN 先處理每支股票最近 50 天的價量型態。</span><br><span class="line">PyKEEN embedding 提供每支股票在財報 KG 中的語意位置。</span><br><span class="line">GraphRAG ticker graph 讓語意相關的股票互相傳遞訊息。</span><br><span class="line">最後 GPM 輸出 portfolio weights 或交易 action。</span><br></pre></td></tr></table></figure>
+<h3 id="kgfusiongpm-的定位">KGFusionGPM 的定位</h3>
+<p>KGFusionGPM 可以理解成 GPM 類型模型的一個擴充版本：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">GPM 原本重點：價格序列 + graph relation</span><br><span class="line">KGFusionGPM 擴充：價格序列 + GraphRAG ticker graph + PyKEEN semantic embedding</span><br></pre></td></tr></table></figure>
+<h2 id="目前完成進度">目前完成進度</h2>
+<p>已完成：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">1. 10-K 財報段落整理</span><br><span class="line">2. GraphRAG input CSV 產生</span><br><span class="line">3. GraphRAG indexing</span><br><span class="line">4. GraphRAG entities / relationships / text_units 產出</span><br><span class="line">5. GraphRAG relationships 轉 PyKEEN triples</span><br><span class="line">6. PyKEEN ComplEx training</span><br><span class="line">7. ticker-aligned PyKEEN embedding export</span><br><span class="line">8. shared concept projection 形成 ticker-level graph</span><br><span class="line">9. GraphRAG graph + PyKEEN embedding 串接到 GPM 類模型的候選實作</span><br><span class="line">10. monthly top-5 action wrapper 候選方案</span><br><span class="line">11. KGFusionGPM offset 原型實驗</span><br><span class="line">12. baseline 腳本與部分 comparison</span><br></pre></td></tr></table></figure>
+<p>目前已完成的原型實驗：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GraphRAG KG + PyKEEN embedding + KGFusionGPM + monthly top-5 rebalance</span><br></pre></td></tr></table></figure>
+<p>但 KGFusionGPM
+尚未確定為正式模型；正式方法需依訓練與交易問題設定決定。</p>
+<p>目前 baseline：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">equal_weight_28</span><br><span class="line">random_top5</span><br><span class="line">price_only_eiie</span><br></pre></td></tr></table></figure>
+<h2 id="待確認問題">待確認問題</h2>
+<h3 id="問題一訓練和選股串接方式">問題一：訓練和選股串接方式</h3>
+<p>方案 A：教授提的 C30 取 5</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">問題設定變成：</span><br><span class="line">有一籃子股票，例如 C30，</span><br><span class="line">每次訓練 / 每次交易時，從這個籃子隨機選取 5 檔進行交易。</span><br></pre></td></tr></table></figure>
+<p>這個設定的重點不是先固定要交易哪 5
+檔，而是讓模型在訓練中反覆遇到不同的 5 檔子集合。因此：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">價量資料：</span><br><span class="line">  每次只放當次抽到的 5 檔股票。</span><br><span class="line">  也就是交易環境仍像 5-stock portfolio。</span><br><span class="line"></span><br><span class="line">KG / embedding 資料：</span><br><span class="line">  放入整個 C30 / 全股票籃子的 graph 和 embedding。</span><br><span class="line">  因為模型事前不知道這次會交易哪 5 檔，</span><br><span class="line">  所以需要先學完整股票籃子的語意位置與關聯性。</span><br></pre></td></tr></table></figure>
+<p>此設定可整理為：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">全籃子 KG memory:</span><br><span class="line">  C30 GraphRAG ticker graph</span><br><span class="line">  C30 PyKEEN embeddings</span><br><span class="line"></span><br><span class="line">每次 episode / batch / rebalance sample:</span><br><span class="line">  隨機抽 5 檔股票</span><br><span class="line">  只取這 5 檔的價量 tensor</span><br><span class="line">  從全籃子 embedding 中取出這 5 檔對應的 embedding</span><br><span class="line">  從全籃子 graph 中取出或聚合這 5 檔相關的 graph 訊息</span><br><span class="line">  讓 GPM 在這個 5-stock 子集合上輸出交易權重</span><br></pre></td></tr></table></figure>
+<p>重點整理：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">價格輸入是當次抽到的 5 檔；</span><br><span class="line">KG / embedding 參照資訊是整個 C30。</span><br></pre></td></tr></table></figure>
+<p>這樣使用完整 embedding 才有意義，因為模型的目標不是只適應固定 5
+檔股票，而是學習整個股票籃子的關聯性，使任意抽到的 5
+檔股票都能對應到完整 KG 空間中的語意位置。</p>
+<p>需要教授確認：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">C30 是固定 Dow 30，還是每期動態候選池？</span><br><span class="line">目前因 MCD / HON 財報資料不足，是否仍維持 28 檔，或要補資料回到 30 檔？</span><br><span class="line">C30 取 5 是每個 episode 隨機抽 5 檔，還是每個 rebalance date 隨機抽 5 檔？</span><br><span class="line">因為 C(30, 5) = 142,506 組，如果全部枚舉訓練可能太久，是否改成每次隨機 sample 5 檔？</span><br><span class="line">若採 random sampling，訓練要 sample 固定幾組，例如 1,000 / 5,000 / 10,000 組，還是依 episode 數決定？</span><br><span class="line">測試時也隨機抽 5 檔，還是由模型從 C30 排名選 5 檔？</span><br><span class="line">GPM 的價量輸入是否固定只有 5 檔？</span><br><span class="line">完整 C30 graph 要怎麼注入到 5-stock GPM：只取 induced subgraph，還是保留全 graph 做 attention / pooling？</span><br><span class="line">取出的 5 檔要由模型分配權重，還是 5 檔等權？</span><br><span class="line">rebalance frequency 是否仍然 monthly？</span><br></pre></td></tr></table></figure>
+<p>方案 B：備用原型實驗：KGFusionGPM monthly rebalance</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">每月第 n 個交易日 rebalance。</span><br><span class="line">KGFusionGPM 原型模型輸出 28 檔股票權重。</span><br><span class="line">wrapper 選權重最高的 5 檔。</span><br><span class="line">其他股票權重歸零。</span><br><span class="line">cash + selected stocks 重新 normalize。</span><br></pre></td></tr></table></figure>
+<p>目前 offset 設定：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">offset 0 = 每月第 1 個交易日 rebalance</span><br><span class="line">offset 1 = 每月第 2 個交易日 rebalance</span><br><span class="line">offset 2 = 每月第 3 個交易日 rebalance</span><br><span class="line">offset 3 = 每月第 4 個交易日 rebalance</span><br><span class="line">offset 4 = 每月第 5 個交易日 rebalance</span><br></pre></td></tr></table></figure>
+<p>原型實驗重點：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">這個版本與目前實作最一致。</span><br><span class="line">可以避免結果只依賴某一天換股。</span><br><span class="line">較接近真實 portfolio rebalance。</span><br><span class="line">目前已有原型實驗輸出。</span><br></pre></td></tr></table></figure>
+<p>需要教授確認：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">如果 C30 取 5 尚未確定，是否可以先使用此原型實驗作為 baseline 或參考實驗？</span><br><span class="line">正式結果要取 5 個 offsets 平均，還是指定某一個 rebalance day？</span><br><span class="line">訓練和測試都要套同一個 offset 嗎？</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://hankkdd.github.io/LLM-Augmented-Knowledge-Graphs-for-Reinforcement-Learning-in-Stock-Trading/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E6%AD%90%E7%88%BE%E9%BA%A5%E7%89%B9.jpg">
+      <meta itemprop="name" content="Hankdd">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hankdd's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/LLM-Augmented-Knowledge-Graphs-for-Reinforcement-Learning-in-Stock-Trading/" class="post-title-link" itemprop="url">基於 RAG 與 LLM 的自動化金融知識圖譜建構</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2026-01-29 13:00:00" itemprop="dateCreated datePublished" datetime="2026-01-29T13:00:00+00:00">2026-01-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2026-05-07 17:11:06" itemprop="dateModified" datetime="2026-05-07T17:11:06+00:00">2026-05-07</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Research/" itemprop="url" rel="index"><span itemprop="name">Research</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Research/Quantitative-Finance/" itemprop="url" rel="index"><span itemprop="name">Quantitative Finance</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>在傳統強化學習交易中，模型往往忽略了公司之間的隱性關聯（如供應鏈、競爭關係）。本專案提出了一種結合
+<strong>檢索增強生成 (RAG)</strong> 與 <strong>大語言模型 (LLM)</strong>
+的方法，從海量財報中自動提取公司關係，建構金融知識圖譜，作為後續強化學習
+(RL) 交易模型的環境基礎。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/LLM-Augmented-Knowledge-Graphs-for-Reinforcement-Learning-in-Stock-Trading/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://hankkdd.github.io/Knowledge-Graph-contructed-by-Graph-RAG/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E6%AD%90%E7%88%BE%E9%BA%A5%E7%89%B9.jpg">
+      <meta itemprop="name" content="Hankdd">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hankdd's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/Knowledge-Graph-contructed-by-Graph-RAG/" class="post-title-link" itemprop="url">Knowledge Graph contructed by Graph RAG</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2026-01-29 10:45:49" itemprop="dateCreated datePublished" datetime="2026-01-29T10:45:49+00:00">2026-01-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2026-05-07 17:11:06" itemprop="dateModified" datetime="2026-05-07T17:11:06+00:00">2026-05-07</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>本篇文章分享一套結合 <strong>GraphRAG</strong> 與
+<strong>推理式鏈結預測 (Inference-based Link Prediction)</strong> 的
+Pipeline 設計，目標是將財報文字轉化為 GNN 模型可用的鄰接矩陣 (Adjacency
+Matrix)。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/Knowledge-Graph-contructed-by-Graph-RAG/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://hankkdd.github.io/Government-Procurement-Web-Crawler/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E6%AD%90%E7%88%BE%E9%BA%A5%E7%89%B9.jpg">
+      <meta itemprop="name" content="Hankdd">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hankdd's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/Government-Procurement-Web-Crawler/" class="post-title-link" itemprop="url">網路爬蟲－政府電子採購網（Gov e-Procurement）</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2026-01-29 00:16:11" itemprop="dateCreated datePublished" datetime="2026-01-29T00:16:11+00:00">2026-01-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2026-05-07 17:11:06" itemprop="dateModified" datetime="2026-05-07T17:11:06+00:00">2026-05-07</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><a
+target="_blank" rel="noopener" href="https://web.pcc.gov.tw/prkms/tender/common/basic/readTenderBasic">政府採購網</a>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/Government-Procurement-Web-Crawler/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://hankkdd.github.io/Put-Call-ratio-analysis/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E6%AD%90%E7%88%BE%E9%BA%A5%E7%89%B9.jpg">
+      <meta itemprop="name" content="Hankdd">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hankdd's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/Put-Call-ratio-analysis/" class="post-title-link" itemprop="url">Put Call ratio analysis</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2026-01-19 15:42:53" itemprop="dateCreated datePublished" datetime="2026-01-19T15:42:53+00:00">2026-01-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2026-05-07 17:11:06" itemprop="dateModified" datetime="2026-05-07T17:11:06+00:00">2026-05-07</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <hr />
+<h1 id="前言introduction">▌前言（Introduction）</h1>
+<p>本研究源自於大二期間加入系上教授實驗室，參與一項以當沖交易策略為核心的研究專案。在該專案中，我負責尋找可供模型學習的選擇權相關因子，以輔助短期交易決策。</p>
+<p>在眾多選擇權指標中，我選擇 <strong>Put–Call Ratio（PCR）</strong>
+作為研究主軸。原因在於 PCR
+能同時反映市場的方向性情緒與避險需求結構，並且廣泛被應用於衍生性商品與市場結構研究中
+。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/Put-Call-ratio-analysis/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Hankdd"
+      src="/images/%E6%AD%90%E7%88%BE%E9%BA%A5%E7%89%B9.jpg">
+  <p class="site-author-name" itemprop="name">Hankdd</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Hankkdd" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Hankkdd" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/hank940429@gmail.com" title="E-Mail → hank940429@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hankdd</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Mulish:300,300italic,400,400italic,700,700italic|Lato:300,300italic,400,400italic,700,700italic|Noto Serif SC:300,300italic,400,400italic,700,700italic|Inconsolata:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"hankkdd.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="在傳統強化學習交易中，模型往往忽略了公司之間的隱性關聯（如供應鏈、競爭關係）。本專案提出了一種結合 檢索增強生成 (RAG) 與 大語言模型 (LLM) 的方法，從海量財報中自動提取公司關係，建構金融知識圖譜，作為後續強化學習 (RL) 交易模型的環境基礎。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基於 RAG 與 LLM 的自動化金融知識圖譜建構">
+<meta property="og:url" content="https://hankkdd.github.io/LLM-Augmented-Knowledge-Graphs-for-Reinforcement-Learning-in-Stock-Trading/index.html">
+<meta property="og:site_name" content="Hankdd&#39;s Blog">
+<meta property="og:description" content="在傳統強化學習交易中，模型往往忽略了公司之間的隱性關聯（如供應鏈、競爭關係）。本專案提出了一種結合 檢索增強生成 (RAG) 與 大語言模型 (LLM) 的方法，從海量財報中自動提取公司關係，建構金融知識圖譜，作為後續強化學習 (RL) 交易模型的環境基礎。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://hankkdd.github.io/assets/knowledge%20graph%20pipeline.jpg">
+<meta property="og:image" content="https://hankkdd.github.io/assets/tech_stocks_with_values.png">
+<meta property="og:image" content="https://hankkdd.github.io/assets/k-NN_result.png">
+<meta property="og:image" content="https://hankkdd.github.io/assets/portfolio_performance_20260120_203059.png">
+<meta property="og:image" content="https://hankkdd.github.io/assets/GPM_Asset_Allocation_20260120_203059.png">
+<meta property="article:published_time" content="2026-01-29T13:00:00.000Z">
+<meta property="article:modified_time" content="2026-05-07T17:11:06.941Z">
+<meta property="article:author" content="Hankdd">
+<meta property="article:tag" content="FinTech">
+<meta property="article:tag" content="Knowledge Graph">
+<meta property="article:tag" content="LLM">
+<meta property="article:tag" content="NLP">
+<meta property="article:tag" content="RAG">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hankkdd.github.io/assets/knowledge%20graph%20pipeline.jpg">
+
+<link rel="canonical" href="https://hankkdd.github.io/LLM-Augmented-Knowledge-Graphs-for-Reinforcement-Learning-in-Stock-Trading/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>基於 RAG 與 LLM 的自動化金融知識圖譜建構 | Hankdd's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hankdd's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://hankkdd.github.io/LLM-Augmented-Knowledge-Graphs-for-Reinforcement-Learning-in-Stock-Trading/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E6%AD%90%E7%88%BE%E9%BA%A5%E7%89%B9.jpg">
+      <meta itemprop="name" content="Hankdd">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hankdd's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          基於 RAG 與 LLM 的自動化金融知識圖譜建構
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2026-01-29 13:00:00" itemprop="dateCreated datePublished" datetime="2026-01-29T13:00:00+00:00">2026-01-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2026-05-07 17:11:06" itemprop="dateModified" datetime="2026-05-07T17:11:06+00:00">2026-05-07</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Research/" itemprop="url" rel="index"><span itemprop="name">Research</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Research/Quantitative-Finance/" itemprop="url" rel="index"><span itemprop="name">Quantitative Finance</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>在傳統強化學習交易中，模型往往忽略了公司之間的隱性關聯（如供應鏈、競爭關係）。本專案提出了一種結合
+<strong>檢索增強生成 (RAG)</strong> 與 <strong>大語言模型 (LLM)</strong>
+的方法，從海量財報中自動提取公司關係，建構金融知識圖譜，作為後續強化學習
+(RL) 交易模型的環境基礎。</p>
+<span id="more"></span>
+<h2 id="知識圖譜架構流程圖">1. 知識圖譜架構流程圖</h2>
+<p><img src="../assets/knowledge%20graph%20pipeline.jpg" /></p>
+<h2 id="實作步驟詳解">2. 實作步驟詳解</h2>
+<h3
+id="步驟一非結構化資料向量化-vectorization">步驟一：非結構化資料向量化
+(Vectorization)</h3>
+<p>首先，針對目標投資池中的公司（如 S&amp;P 500
+成分股或科技股），收集其最新的年度財務報告（10-K）或法說會逐字稿。</p>
+<ul>
+<li><strong>資料清洗</strong>：去除財報中的免責聲明、表格雜訊。</li>
+<li><strong>文本切塊 (Chunking)</strong>：將長文本切分為適合 Embedding
+模型處理的段落。</li>
+<li><strong>向量資料庫</strong>：將處理後的文本嵌入並存入 FAISS
+向量資料庫。</li>
+</ul>
+<h3 id="步驟二檢索增強-rag-retrieval">步驟二：檢索增強 (RAG
+Retrieval)</h3>
+<p>為了避免文本太長容易導致 LLM 產生幻覺，我採用 RAG 來濃縮文本。</p>
+<ul>
+<li><p><strong>Query
+設定</strong>：針對每一家公司，查詢主要產品、供應鏈、競爭關係等關鍵字。</p></li>
+<li><p><strong>Top-k 召回</strong>：從向量資料庫中檢索出與查詢
+<strong>相關度最高的 5 份 (Top-5)</strong>
+文本片段。這些片段通常包含了具體的業務合作、供應鏈依賴或市場競爭描述。</p></li>
+</ul>
+<h3 id="步驟三llm-關係推理-llm-reasoning">步驟三：LLM 關係推理 (LLM
+Reasoning)</h3>
+<p>將檢索到的 Top-5 文本片段作為 Context，餵給 LLM 進行推理。</p>
+<ul>
+<li><p><strong>Prompt 設計</strong>：要求 LLM
+扮演金融分析師，分析文本並提取三元組
+<code>(Head, Relation, Tail)</code>。</p></li>
+<li><p><strong>實體對齊</strong>：確保提取的公司名稱標準化（例如將
+“TSMC”, “Taiwan Semiconductor” 統一為節點 <code>TSMC</code>）。</p></li>
+</ul>
+<blockquote>
+<p><strong>Prompt 範例：</strong></p>
+</blockquote>
+<blockquote>
+<p>“基於以下提供的財報片段，分析公司 A
+在產品、供應鏈、競爭對手的公司實體，並生成h r t。</p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="http://localhost:7475/browser/">視覺化</a></p>
+<h3 id="步驟四-將知識圖譜轉成embedding">步驟四:
+將知識圖譜轉成Embedding</h3>
+<p>為了量化公司之間的關係強度，我使用 <strong>PyKEEN</strong>
+對上述圖譜進行訓練。</p>
+<ul>
+<li><strong>模型選擇</strong>：採用MuRe模型。</li>
+<li><strong>輸出結果</strong>：每家公司被映射為一個固定維度的向量
+(Entity Embedding)。</li>
+</ul>
+<p><img src="../assets/tech_stocks_with_values.png" /></p>
+<h3 id="步驟五-k-nn-圖譜分層">步驟五: k-NN 圖譜分層</h3>
+<p>直接使用全連接圖會引入過多雜訊，因此我計算 Embedding 之間的餘弦相似度
+(Cosine Similarity)，並採用 <strong>k-近鄰演算法 (k-NN)</strong>
+進行稀疏化：</p>
+<ol type="1">
+<li><strong>相似度矩陣</strong>：計算所有公司向量的兩兩相似度。</li>
+<li><strong>Top-k 篩選</strong>：對每個節點，僅保留相似度最高的 <span
+class="math inline"><em>k</em></span> 個鄰居 (<span
+class="math inline"><em>k</em> = 5</span>)，確保圖的稀疏性與運算效率。</li>
+<li><strong>邊屬性定義 (Edge Typing)</strong>：
+<ul>
+<li><strong>Strong Edge (Top
+5%)</strong>：視為強依賴關係，賦予最高權重。</li>
+<li><strong>Medium Edge (Top 20%)</strong>：視為板塊內連動。</li>
+<li><strong>Weak Edge</strong>：視為潛在關聯。</li>
+</ul></li>
+</ol>
+<p><img src="../assets/k-NN_result.png" /></p>
+<h3 id="步驟六-圖強化學習">步驟六: 圖強化學習</h3>
+<p>最後，將 步驟五 建構的「靜態圖結構」與 Yahoo Finance
+下載的「動態股價特徵」結合，輸入至 <strong>GPM (Geometric Portfolio
+Manager)</strong> 模型中。</p>
+<ul>
+<li><strong>圖結構 (Graph Structure)</strong>：提供基本面邏輯。</li>
+<li><strong>節點特徵 (Node
+Features)</strong>：提供市場時序訊號（Open/High/Low/Close）。</li>
+<li><strong>優勢</strong>：RL Agent
+能在股價尚未反應時，透過圖結構感知資訊傳遞。</li>
+</ul>
+<p><img src="../assets/portfolio_performance_20260120_203059.png" />
+<img src="../assets/GPM_Asset_Allocation_20260120_203059.png" /></p>
+<h2 id="總結-conclusion">4. 總結 (Conclusion)</h2>
+<p>利用 RAG + LLM
+自動建構圖譜，大幅降低了人工標註的成本，並能捕捉到傳統量化模型忽略的非線性關係。下一步將著重於優化
+Prompt 的精準度以及引入時序動態圖 (Temporal Graph)。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/RAG/" rel="tag"># RAG</a>
+              <a href="/tags/LLM/" rel="tag"># LLM</a>
+              <a href="/tags/Knowledge-Graph/" rel="tag"># Knowledge Graph</a>
+              <a href="/tags/FinTech/" rel="tag"># FinTech</a>
+              <a href="/tags/NLP/" rel="tag"># NLP</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Knowledge-Graph-contructed-by-Graph-RAG/" rel="prev" title="Knowledge Graph contructed by Graph RAG">
+      <i class="fa fa-chevron-left"></i> Knowledge Graph contructed by Graph RAG
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/0509/" rel="next" title="509">
+      509 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9F%A5%E8%AD%98%E5%9C%96%E8%AD%9C%E6%9E%B6%E6%A7%8B%E6%B5%81%E7%A8%8B%E5%9C%96"><span class="nav-number">1.</span> <span class="nav-text">1. 知識圖譜架構流程圖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%A6%E4%BD%9C%E6%AD%A5%E9%A9%9F%E8%A9%B3%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">2. 實作步驟詳解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A5%E9%A9%9F%E4%B8%80%E9%9D%9E%E7%B5%90%E6%A7%8B%E5%8C%96%E8%B3%87%E6%96%99%E5%90%91%E9%87%8F%E5%8C%96-vectorization"><span class="nav-number">2.1.</span> <span class="nav-text">步驟一：非結構化資料向量化
+(Vectorization)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A5%E9%A9%9F%E4%BA%8C%E6%AA%A2%E7%B4%A2%E5%A2%9E%E5%BC%B7-rag-retrieval"><span class="nav-number">2.2.</span> <span class="nav-text">步驟二：檢索增強 (RAG
+Retrieval)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A5%E9%A9%9F%E4%B8%89llm-%E9%97%9C%E4%BF%82%E6%8E%A8%E7%90%86-llm-reasoning"><span class="nav-number">2.3.</span> <span class="nav-text">步驟三：LLM 關係推理 (LLM
+Reasoning)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A5%E9%A9%9F%E5%9B%9B-%E5%B0%87%E7%9F%A5%E8%AD%98%E5%9C%96%E8%AD%9C%E8%BD%89%E6%88%90embedding"><span class="nav-number">2.4.</span> <span class="nav-text">步驟四:
+將知識圖譜轉成Embedding</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A5%E9%A9%9F%E4%BA%94-k-nn-%E5%9C%96%E8%AD%9C%E5%88%86%E5%B1%A4"><span class="nav-number">2.5.</span> <span class="nav-text">步驟五: k-NN 圖譜分層</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A5%E9%A9%9F%E5%85%AD-%E5%9C%96%E5%BC%B7%E5%8C%96%E5%AD%B8%E7%BF%92"><span class="nav-number">2.6.</span> <span class="nav-text">步驟六: 圖強化學習</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B8%BD%E7%B5%90-conclusion"><span class="nav-number">3.</span> <span class="nav-text">4. 總結 (Conclusion)</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Hankdd"
+      src="/images/%E6%AD%90%E7%88%BE%E9%BA%A5%E7%89%B9.jpg">
+  <p class="site-author-name" itemprop="name">Hankdd</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Hankkdd" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Hankkdd" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/hank940429@gmail.com" title="E-Mail → hank940429@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hankdd</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Mulish:300,300italic,400,400italic,700,700italic|Lato:300,300italic,400,400italic,700,700italic|Noto Serif SC:300,300italic,400,400italic,700,700italic|Inconsolata:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"hankkdd.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="政府採購網">
+<meta property="og:type" content="article">
+<meta property="og:title" content="網路爬蟲－政府電子採購網（Gov e-Procurement）">
+<meta property="og:url" content="https://hankkdd.github.io/Government-Procurement-Web-Crawler/index.html">
+<meta property="og:site_name" content="Hankdd&#39;s Blog">
+<meta property="og:description" content="政府採購網">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://hankkdd.github.io/assets/webCrawler/count.jpg">
+<meta property="og:image" content="https://hankkdd.github.io/assets/webCrawler/tbb2.jpg">
+<meta property="og:image" content="https://hankkdd.github.io/assets/webCrawler/Snipaste_2026-01-29_00-27-38.jpg">
+<meta property="article:published_time" content="2026-01-29T00:16:11.000Z">
+<meta property="article:modified_time" content="2026-05-07T17:11:06.941Z">
+<meta property="article:author" content="Hankdd">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hankkdd.github.io/assets/webCrawler/count.jpg">
+
+<link rel="canonical" href="https://hankkdd.github.io/Government-Procurement-Web-Crawler/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>網路爬蟲－政府電子採購網（Gov e-Procurement） | Hankdd's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hankdd's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://hankkdd.github.io/Government-Procurement-Web-Crawler/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E6%AD%90%E7%88%BE%E9%BA%A5%E7%89%B9.jpg">
+      <meta itemprop="name" content="Hankdd">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hankdd's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          網路爬蟲－政府電子採購網（Gov e-Procurement）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2026-01-29 00:16:11" itemprop="dateCreated datePublished" datetime="2026-01-29T00:16:11+00:00">2026-01-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2026-05-07 17:11:06" itemprop="dateModified" datetime="2026-05-07T17:11:06+00:00">2026-05-07</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><a
+target="_blank" rel="noopener" href="https://web.pcc.gov.tw/prkms/tender/common/basic/readTenderBasic">政府採購網</a>
+<span id="more"></span></p>
+<h3 id="參數化查詢url-builder">1. 參數化查詢：URL Builder</h3>
+<p>政府採購網本質上是用 Query String 控制搜尋條件，
+所以我把所有搜尋條件（關鍵字、日期、標的分類）集中在一個 build_url
+函式。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">build_url</span>(<span class="params">keyword: <span class="built_in">str</span>, start_date: <span class="built_in">str</span>, end_date: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    params = &#123;</span><br><span class="line">        <span class="string">&quot;tenderName&quot;</span>: keyword,</span><br><span class="line">        <span class="string">&quot;tenderStartDate&quot;</span>: start_date,  <span class="comment"># yyyy/mm/dd</span></span><br><span class="line">        <span class="string">&quot;tenderEndDate&quot;</span>: end_date,      <span class="comment"># yyyy/mm/dd</span></span><br><span class="line">        <span class="string">&quot;radProctrgCate&quot;</span>: <span class="string">&quot;RAD_PROCTRG_CATE_3&quot;</span>, <span class="comment"># 標的分類：勞務</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> BASE + <span class="string">&quot;?&quot;</span> + up.urlencode(params, safe=<span class="string">&quot;/&quot;</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="模仿瀏覽器行為session">2. 模仿瀏覽器行為：Session</h3>
+<p>這是爬蟲能否維持連貫對話的關鍵。 我這邊是用 Session 來做兩件事：</p>
+<ul>
+<li><p>自動保存 Cookie（包含 Session ID）</p></li>
+<li><p>模擬瀏覽器的連續操作行為</p></li>
+</ul>
+<p>使用 requests.Session() 發送請求時，伺服器回傳的 Session ID
+會被自動儲存在內部的 Cookie 中。當我們接續發送 session.get() 或
+session.post() 時，程式會自動帶出相同的 Session ID。若不使用 Session
+物件，伺服器會將每次請求視為互相獨立的個體，導致無法正確讀取分頁或維持登入狀態。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">s = requests.Session()</span><br><span class="line">s.headers.update(HEADERS)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 發送請求並檢查狀態</span></span><br><span class="line">resp = s.get(url, timeout=<span class="number">20</span>)</span><br><span class="line">resp.raise_for_status()</span><br></pre></td></tr></table></figure>
+<h3 id="定位目標數據-beautifulsoup">3.定位目標數據 : BeautifulSoup</h3>
+<p><img src="../assets/webCrawler/count.jpg" /> 在解析 HTML
+的時候，我沒有一開始就直接抓資料列。</p>
+<p>先透過 BeautifulSoup 先抓取總筆數作為驗證</p>
+<p><img src="../assets/webCrawler/tbb2.jpg" /></p>
+<p>接著精確鎖定特定的 CSS Class（如 .tb_b2,
+.tb_b3），只解析真正的數據列，排除表頭與雜訊。 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">def parse_rows(soup: BeautifulSoup):</span><br><span class="line">    # 定位目標表格</span><br><span class="line">    table = soup.find(&quot;table&quot;, class_=&quot;tb_01&quot;)</span><br><span class="line">    </span><br><span class="line">    for tr in table.find_all(&quot;tr&quot;):</span><br><span class="line">        cls = tr.get(&quot;class&quot;) or []</span><br><span class="line">        if &quot;tb_b2&quot; in cls or &quot;tb_b3&quot; in cls:</span><br><span class="line">            # 提取邏輯...</span><br><span class="line"></span><br></pre></td></tr></table></figure></p>
+<h3 id="javascript-封裝字串的還原">4. JavaScript 封裝字串的還原</h3>
+<p>政府採購網的「標案名稱」並非直接寫在 HTML 中， 而是被包在 JavaScript
+函數內，例如：</p>
+<p><img src="../assets/webCrawler/Snipaste_2026-01-29_00-27-38.jpg" />
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Geps3</span>.<span class="property">CNS</span>.<span class="title function_">pageCode2Img</span>(<span class="string">&quot;encoded_string&quot;</span>);</span><br></pre></td></tr></table></figure> 因此無法用一般 .text 方式取得。</p>
+<p>直接把 script 當成純文字處理：</p>
+<p>所以用字串切割把編碼內容取出來</p>
+<p>再用 html.unescape 還原成可讀文字</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">def decode_pageCode2Img(raw_html: str, span_id: str) -&gt; str:</span><br><span class="line">    marker = &#x27;Geps3.CNS.pageCode2Img(&quot;&#x27;</span><br><span class="line">    # 從 script 內容中切割出編碼文字</span><br><span class="line">    a = raw_html.split(marker)</span><br><span class="line">    content = a[1].split(&#x27;&quot;);&#x27;)[0]</span><br><span class="line">    return html.unescape(content)</span><br></pre></td></tr></table></figure>
+<h3 id="debug">5. DeBug</h3>
+<ul>
+<li><p>查詢失敗 → 檢查 URL Builder</p></li>
+<li><p>抓不到資料 → 檢查 Session</p></li>
+<li><p>欄位亂掉 → 檢查 parser</p></li>
+<li><p>名稱空白 → 檢查 JS decode</p></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Put-Call-ratio-analysis/" rel="prev" title="Put Call ratio analysis">
+      <i class="fa fa-chevron-left"></i> Put Call ratio analysis
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Knowledge-Graph-contructed-by-Graph-RAG/" rel="next" title="Knowledge Graph contructed by Graph RAG">
+      Knowledge Graph contructed by Graph RAG <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%83%E6%95%B8%E5%8C%96%E6%9F%A5%E8%A9%A2url-builder"><span class="nav-number">1.</span> <span class="nav-text">1. 參數化查詢：URL Builder</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E4%BB%BF%E7%80%8F%E8%A6%BD%E5%99%A8%E8%A1%8C%E7%82%BAsession"><span class="nav-number">2.</span> <span class="nav-text">2. 模仿瀏覽器行為：Session</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9A%E4%BD%8D%E7%9B%AE%E6%A8%99%E6%95%B8%E6%93%9A-beautifulsoup"><span class="nav-number">3.</span> <span class="nav-text">3.定位目標數據 : BeautifulSoup</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#javascript-%E5%B0%81%E8%A3%9D%E5%AD%97%E4%B8%B2%E7%9A%84%E9%82%84%E5%8E%9F"><span class="nav-number">4.</span> <span class="nav-text">4. JavaScript 封裝字串的還原</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#debug"><span class="nav-number">5.</span> <span class="nav-text">5. DeBug</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Hankdd"
+      src="/images/%E6%AD%90%E7%88%BE%E9%BA%A5%E7%89%B9.jpg">
+  <p class="site-author-name" itemprop="name">Hankdd</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Hankkdd" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Hankkdd" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/hank940429@gmail.com" title="E-Mail → hank940429@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hankdd</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Mulish:300,300italic,400,400italic,700,700italic|Lato:300,300italic,400,400italic,700,700italic|Noto Serif SC:300,300italic,400,400italic,700,700italic|Inconsolata:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"hankkdd.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="本篇文章分享一套結合 GraphRAG 與 推理式鏈結預測 (Inference-based Link Prediction) 的 Pipeline 設計，目標是將財報文字轉化為 GNN 模型可用的鄰接矩陣 (Adjacency Matrix)。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Knowledge Graph contructed by Graph RAG">
+<meta property="og:url" content="https://hankkdd.github.io/Knowledge-Graph-contructed-by-Graph-RAG/index.html">
+<meta property="og:site_name" content="Hankdd&#39;s Blog">
+<meta property="og:description" content="本篇文章分享一套結合 GraphRAG 與 推理式鏈結預測 (Inference-based Link Prediction) 的 Pipeline 設計，目標是將財報文字轉化為 GNN 模型可用的鄰接矩陣 (Adjacency Matrix)。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-01-29T10:45:49.000Z">
+<meta property="article:modified_time" content="2026-05-07T17:11:06.941Z">
+<meta property="article:author" content="Hankdd">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://hankkdd.github.io/Knowledge-Graph-contructed-by-Graph-RAG/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Knowledge Graph contructed by Graph RAG | Hankdd's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hankdd's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://hankkdd.github.io/Knowledge-Graph-contructed-by-Graph-RAG/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E6%AD%90%E7%88%BE%E9%BA%A5%E7%89%B9.jpg">
+      <meta itemprop="name" content="Hankdd">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hankdd's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Knowledge Graph contructed by Graph RAG
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2026-01-29 10:45:49" itemprop="dateCreated datePublished" datetime="2026-01-29T10:45:49+00:00">2026-01-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2026-05-07 17:11:06" itemprop="dateModified" datetime="2026-05-07T17:11:06+00:00">2026-05-07</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本篇文章分享一套結合 <strong>GraphRAG</strong> 與
+<strong>推理式鏈結預測 (Inference-based Link Prediction)</strong> 的
+Pipeline 設計，目標是將財報文字轉化為 GNN 模型可用的鄰接矩陣 (Adjacency
+Matrix)。</p>
+<span id="more"></span>
+<h2 id="系統架構圖">系統架構圖</h2>
+<p>本流程分為兩個主要階段：<strong>索引建構 (Indexing)</strong> 與
+<strong>關係推理 (Reasoning)</strong>。</p>
+<blockquote>
+
+</blockquote>
+<p><img
+src="../assets/GraphRAG%20Indexing%20Pipeline-2026-01-29-023019.png" /></p>
+<hr />
+<h2 id="phase-1-建立專屬金融知識庫-knowledge-indexing">Phase 1:
+建立專屬金融知識庫 (Knowledge Indexing)</h2>
+<p>利用 GraphRAG 將非結構化的財報轉化為結構化的圖譜索引。</p>
+<h3 id="step-1.1-資料前處理-data-preparation">Step 1.1: 資料前處理 (Data
+Preparation)</h3>
+<ul>
+<li><strong>輸入 (Input):</strong> 原始美股 SEC 10-K/10-Q 報告。</li>
+<li><strong>處理 (Process):</strong> 提取核心章節（Item 1, 1A,
+7），進行文字清洗與分塊。</li>
+<li><strong>輸出 (Output):</strong> 清理後的
+<code>{TICKER}_cleaned.txt</code>。</li>
+</ul>
+<h3 id="step-1.2-實體與社群檢測-indexing-execution">Step 1.2:
+實體與社群檢測 (Indexing Execution)</h3>
+<p>此步驟透過 LLM 識別實體（公司、人物、技術）並利用 <strong>Leiden
+演算法</strong> 進行層次化社群檢測。</p>
+<ul>
+<li><strong>核心技術:</strong> Hierarchical Community Detection。</li>
+<li><strong>產出物:</strong> 包含實體 (Entities)、基礎關係
+(Relationships) 與社群報告 (Community Reports) 的 Parquet 檔案。</li>
+</ul>
+<hr />
+<h2 id="phase-2-推理式圖譜建構-inference-based-graph-construction">Phase
+2: 推理式圖譜建構 (Inference-based Graph Construction)</h2>
+<p>這是研究的核心創新點，不依賴傳統的向量相似度，而是利用 LLM
+對「社群摘要」的邏輯推理能力。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">步驟</th>
+<th style="text-align: left;">說明</th>
+<th style="text-align: left;">關鍵輸出</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>2.1 成對組合</strong></td>
+<td style="text-align: left;">生成目標公司列表的所有可能配對 <span
+class="math inline"><em>C</em>(<em>n</em>,2)</span></td>
+<td style="text-align: left;">候選清單 (Pair List)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>2.2 關係推理</strong></td>
+<td style="text-align: left;">調用 GraphRAG Local Search
+檢索相關社群背景，讓 LLM 判斷關係類型</td>
+<td style="text-align: left;">JSON (含推理邏輯與分類代碼)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>2.3 圖譜聚合</strong></td>
+<td style="text-align: left;">解析推理結果，轉換為結構化資料</td>
+<td style="text-align: left;"><strong>Edge List / Adjacency
+Matrix</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="關係分類代碼定義">關係分類代碼定義</h3>
+<ol type="1">
+<li><strong>0:</strong> 無明確關聯</li>
+<li><strong>1:</strong> 供應鏈關係 (Supply Chain)</li>
+<li><strong>2:</strong> 競爭關係 (Competition)</li>
+<li><strong>3:</strong> 戰略合作 (Cooperation)</li>
+</ol>
+<hr />
+<h2 id="結語與展望">結語與展望</h2>
+<p>目前這套 Pipeline
+已能穩定生成鄰接矩陣。下一步將探索如何優化查詢成本，並將此動態圖譜正式導入強化學習
+(RL) 的環境狀態中。</p>
+<hr />
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Government-Procurement-Web-Crawler/" rel="prev" title="網路爬蟲－政府電子採購網（Gov e-Procurement）">
+      <i class="fa fa-chevron-left"></i> 網路爬蟲－政府電子採購網（Gov e-Procurement）
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/LLM-Augmented-Knowledge-Graphs-for-Reinforcement-Learning-in-Stock-Trading/" rel="next" title="基於 RAG 與 LLM 的自動化金融知識圖譜建構">
+      基於 RAG 與 LLM 的自動化金融知識圖譜建構 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B3%BB%E7%B5%B1%E6%9E%B6%E6%A7%8B%E5%9C%96"><span class="nav-number">1.</span> <span class="nav-text">系統架構圖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#phase-1-%E5%BB%BA%E7%AB%8B%E5%B0%88%E5%B1%AC%E9%87%91%E8%9E%8D%E7%9F%A5%E8%AD%98%E5%BA%AB-knowledge-indexing"><span class="nav-number">2.</span> <span class="nav-text">Phase 1:
+建立專屬金融知識庫 (Knowledge Indexing)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#step-1.1-%E8%B3%87%E6%96%99%E5%89%8D%E8%99%95%E7%90%86-data-preparation"><span class="nav-number">2.1.</span> <span class="nav-text">Step 1.1: 資料前處理 (Data
+Preparation)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#step-1.2-%E5%AF%A6%E9%AB%94%E8%88%87%E7%A4%BE%E7%BE%A4%E6%AA%A2%E6%B8%AC-indexing-execution"><span class="nav-number">2.2.</span> <span class="nav-text">Step 1.2:
+實體與社群檢測 (Indexing Execution)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#phase-2-%E6%8E%A8%E7%90%86%E5%BC%8F%E5%9C%96%E8%AD%9C%E5%BB%BA%E6%A7%8B-inference-based-graph-construction"><span class="nav-number">3.</span> <span class="nav-text">Phase
+2: 推理式圖譜建構 (Inference-based Graph Construction)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%9C%E4%BF%82%E5%88%86%E9%A1%9E%E4%BB%A3%E7%A2%BC%E5%AE%9A%E7%BE%A9"><span class="nav-number">3.1.</span> <span class="nav-text">關係分類代碼定義</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B5%90%E8%AA%9E%E8%88%87%E5%B1%95%E6%9C%9B"><span class="nav-number">4.</span> <span class="nav-text">結語與展望</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Hankdd"
+      src="/images/%E6%AD%90%E7%88%BE%E9%BA%A5%E7%89%B9.jpg">
+  <p class="site-author-name" itemprop="name">Hankdd</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Hankkdd" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Hankkdd" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/hank940429@gmail.com" title="E-Mail → hank940429@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hankdd</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
